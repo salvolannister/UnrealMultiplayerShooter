@@ -102,7 +102,7 @@ void UMy_ShooterCharacterMovement::FSavedMove_My::PrepMoveFor(class ACharacter* 
 	}
 }
 
-// Function to decompress flags from a saved Move
+// Function to decompress flags from a saved Move and to trigger the new ability to the server side
 void UMy_ShooterCharacterMovement::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);

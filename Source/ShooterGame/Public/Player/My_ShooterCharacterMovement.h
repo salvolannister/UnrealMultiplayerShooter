@@ -73,7 +73,7 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 		// So we can use Super::
 		typedef FNetworkPredictionData_Client_Character Super;
 
-		// This function allocates our Move, it basically return our Move that we have created before.
+		// This function allocates our Move, it basically returns our custom Move.
 		virtual FSavedMovePtr AllocateNewMove() override;
 	};
 
