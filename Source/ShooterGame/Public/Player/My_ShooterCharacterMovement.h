@@ -61,6 +61,9 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 
 		// The flag that tell us when we want to teleport, the Saved version of bWantsToTeleport
 		uint8 bSavedWantsToTeleport : 1;
+
+		// The flag that tell us when we want to use the jetpack. The saved version of bWantsToUseJetpack
+		uint8 bSavedWantsToUseJetpack : 1;
 	};
 
 	// We also need our version of the FNetworkPredictionData_Client_Character class to allocate our own Move.
@@ -81,7 +84,8 @@ public:
 	// Function called from the input binding in the character
 	UFUNCTION(BlueprintCallable, Category = "Custom Character Movement")
 	void Teleport();
-
+	void UseJetpack();
+    bool IsClient();
 private:
 	// Function to decompress flags from a saved Move
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
@@ -93,18 +97,31 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void Server_SendTeleportLocation(FVector LocationToTeleport);
 
+
+	// RPC that will execute on the server, sending the location to which the character will fly. We can validate if we want.
+	UFUNCTION(Reliable, Server, WithValidation)
+    void Server_SendJetpackLocation(FVector LocationToFly);
+
+
 	// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
 	void OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	// Location to which the character will teleport
 	FVector TeleportLocation;
 
+	// Location to which the character will be moved using the jetpack
+	FVector JetpackLocation;
+
 	// We want to teleport 10m forward
 	float TeleportOffset = 1000;
 
+	// 10 dm
+	float JetpackOffset = 10;
 	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
 	// We use a single bit of a byte to fit this boolean in the FSavedMove_Character template we will override
 	uint8 bWantsToTeleport : 1;
+
+	uint8 bWantsToUseJetpack : 1;
 };
 
 

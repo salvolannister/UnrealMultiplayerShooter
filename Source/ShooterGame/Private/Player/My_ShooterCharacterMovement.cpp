@@ -3,6 +3,38 @@
 #include "ShooterGame.h"
 #include "My_ShooterCharacterMovement.h"
 
+bool UMy_ShooterCharacterMovement::IsClient() 
+{
+	return PawnOwner->GetLocalRole() == ENetRole::ROLE_AutonomousProxy;
+}
+
+// Function called from the input bindings in the character ( press J)
+void UMy_ShooterCharacterMovement::UseJetpack()
+{
+	// Calcolate the Location to teleport to
+	JetpackLocation = PawnOwner->GetActorLocation();
+
+	// If we are the client and we have control we send the location to the server 
+	if (IsClient())
+		Server_SendJetpackLocation(JetpackLocation);
+
+	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
+	bWantsToUseJetpack = true;
+}
+
+//TODO: implement a check to avoid cheater tricks
+bool UMy_ShooterCharacterMovement::Server_SendJetpackLocation_Validate(FVector LocationToFly)
+{
+	return true;
+}
+
+void UMy_ShooterCharacterMovement::Server_SendJetpackLocation_Implementation(FVector LocationToFly)
+{
+	//TeleportLocation = LocationToTeleport;
+}
+
+
+#pragma region teleport
 // Function called from the input binding in the character
 void UMy_ShooterCharacterMovement::Teleport()
 {
@@ -29,6 +61,8 @@ void UMy_ShooterCharacterMovement::Server_SendTeleportLocation_Implementation(FV
 {
 	TeleportLocation = LocationToTeleport;
 }
+
+#pragma endregion 
 
 // Function native of the standard Movement Component, this function is triggered at the end of a movement update.
 void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity)

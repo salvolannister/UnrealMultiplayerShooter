@@ -28,6 +28,8 @@ private:
 
 	// Function that will call the Teleport implementation in the Movement Component
 	void Teleport();
+	// Function that will call teh Jetpack implementation in the Movement Component
+	void UseJetpack();
 };
 
 
