@@ -3,7 +3,7 @@
 #include "ShooterGame.h"
 #include "My_ShooterCharacterMovement.h"
 
-bool UMy_ShooterCharacterMovement::IsClient() 
+bool UMy_ShooterCharacterMovement::IsClient()
 {
 	return PawnOwner->GetLocalRole() == ENetRole::ROLE_AutonomousProxy;
 }
@@ -12,25 +12,29 @@ bool UMy_ShooterCharacterMovement::IsClient()
 void UMy_ShooterCharacterMovement::UseJetpack()
 {
 	// Calcolate the Location to teleport to
-	JetpackLocation = PawnOwner->GetActorLocation();
+#if UE_BUILD_DEBUG
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, " Wants to use jetpack");
+#endif
+
+	Velocity.Z = 4;
 
 	// If we are the client and we have control we send the location to the server 
 	if (IsClient())
-		Server_SendJetpackLocation(JetpackLocation);
+		Server_SetJetpackVelocity(Velocity.Z);
 
 	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
 	bWantsToUseJetpack = true;
 }
 
 //TODO: implement a check to avoid cheater tricks
-bool UMy_ShooterCharacterMovement::Server_SendJetpackLocation_Validate(FVector LocationToFly)
+bool UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Validate(float JetpackVelocity)
 {
 	return true;
 }
 
-void UMy_ShooterCharacterMovement::Server_SendJetpackLocation_Implementation(FVector LocationToFly)
+void UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Implementation(float JetpackVelocity)
 {
-	//TeleportLocation = LocationToTeleport;
+	Velocity.Z = JetpackVelocity;
 }
 
 
@@ -38,13 +42,14 @@ void UMy_ShooterCharacterMovement::Server_SendJetpackLocation_Implementation(FVe
 // Function called from the input binding in the character
 void UMy_ShooterCharacterMovement::Teleport()
 {
-	// Calcolate the Location to teleport to
 	TeleportLocation = PawnOwner->GetActorLocation() + PawnOwner->GetActorForwardVector() * TeleportOffset;
 
 	// If we are the client and we have control we send the location to the server 
-	
-	if (PawnOwner->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-	Server_SendTeleportLocation(TeleportLocation);
+	if (PawnOwner->GetLocalRole() == ENetRole::ROLE_AutonomousProxy) {
+
+		// Calcolate the Location to teleport to
+		Server_SendTeleportLocation(TeleportLocation);
+	}
 
 	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
 	bWantsToTeleport = true;
@@ -77,6 +82,12 @@ void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVec
 
 		// Sweep so we avoid collisions
 		CharacterOwner->SetActorLocation(TeleportLocation, true);
+	}
+
+	if (bWantsToUseJetpack) 
+	{
+		bWantsToUseJetpack = false;
+
 	}
 
 	Super::OnMovementUpdated(DeltaTime, OldLocation, OldVelocity);
@@ -120,6 +131,8 @@ void UMy_ShooterCharacterMovement::FSavedMove_My::SetMoveFor(ACharacter* Charact
 	{
 		bSavedWantsToTeleport = CharacterMovement->bWantsToTeleport;
 		SavedTeleportLocation = CharacterMovement->TeleportLocation;
+		bSavedWantsToUseJetpack = CharacterMovement->bWantsToUseJetpack;
+		SavedJetpackVelocity = CharacterMovement->Velocity.Z;
 	}
 }
 
@@ -133,6 +146,7 @@ void UMy_ShooterCharacterMovement::FSavedMove_My::PrepMoveFor(class ACharacter* 
 	if (CharacterMovement)
 	{
 		CharacterMovement->TeleportLocation = SavedTeleportLocation;
+		CharacterMovement->Velocity.Z = SavedJetpackVelocity;
 	}
 }
 
@@ -163,12 +177,23 @@ uint8 UMy_ShooterCharacterMovement::FSavedMove_My::GetCompressedFlags() const
 		Result |= FLAG_Custom_1;
 	}
 
+	if (bSavedWantsToUseJetpack)
+	{
+		Result |= FLAG_Custom_2;
+	}
+
 	return Result;
 }
 
 bool UMy_ShooterCharacterMovement::FSavedMove_My::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* Character, float MaxDelta) const
 {
+	// We tell to not send our moves combined with other ones
 	if (bSavedWantsToTeleport != ((FSavedMove_My*)&NewMove)->bSavedWantsToTeleport)
+	{
+		return false;
+	}
+
+	if (bSavedWantsToUseJetpack != ((FSavedMove_My*)&NewMove)->bSavedWantsToUseJetpack)
 	{
 		return false;
 	}

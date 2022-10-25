@@ -59,6 +59,8 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 		// The location to where we were teleporting in this Move. The saved version of TeleportLocation.
 		FVector SavedTeleportLocation;
 
+		// Velocity of the jetpack on Z
+		float SavedJetpackVelocity;
 		// The flag that tell us when we want to teleport, the Saved version of bWantsToTeleport
 		uint8 bSavedWantsToTeleport : 1;
 
@@ -100,7 +102,7 @@ private:
 
 	// RPC that will execute on the server, sending the location to which the character will fly. We can validate if we want.
 	UFUNCTION(Reliable, Server, WithValidation)
-    void Server_SendJetpackLocation(FVector LocationToFly);
+    void Server_SetJetpackVelocity(float JetpackVelocity);
 
 
 	// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
