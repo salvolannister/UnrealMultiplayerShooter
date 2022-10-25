@@ -40,7 +40,7 @@ void AMy_ShooterCharacter::UseJetpack()
 	}
 }
 
-// Function for get our Movement Component without casting
+// Function for get our Movement Component 
 UMy_ShooterCharacterMovement* AMy_ShooterCharacter::GetMyMovementComponent() const
 {
 	return Cast<UMy_ShooterCharacterMovement>(GetCharacterMovement());
