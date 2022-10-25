@@ -7,13 +7,13 @@
 #include "My_ShooterCharacterMovement.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMovement
 {
 	GENERATED_BODY()
-	
+
 		/*
 	Moves are data that have all the information about some specific movement that the player has done.
 	When a movement is performed locally we need also to create a Move, save it in memory and send it to the server to work properly with Replication.
@@ -22,7 +22,7 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 	*/
 
 	// We create our own Move from the standard that Unreal uses (FSavedMove_Character)
-	class FSavedMove_My : public FSavedMove_Character
+		class FSavedMove_My : public FSavedMove_Character
 	{
 	public:
 		//So we can use Super::
@@ -84,10 +84,14 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 
 public:
 	// Function called from the input binding in the character
+	UMy_ShooterCharacterMovement();
 	UFUNCTION(BlueprintCallable, Category = "Custom Character Movement")
-	void Teleport();
+    void Teleport();
 	void UseJetpack();
-    bool IsClient();
+	bool IsClient();
+	bool CanUseJetpack();
+
+	bool IsJetpacking;
 private:
 	// Function to decompress flags from a saved Move
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
@@ -95,35 +99,46 @@ private:
 	// Get prediction data for a client game. Allocates the data on demand and can be overridden to allocate a custom override if desired.
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)  override;
+
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+
+	void PhysJetpack(float deltaTime, int32 Iterations);
+
+	
 	// RPC that will execute on the server, sending the location to which the character will teleport. We can validate if we want.
 	UFUNCTION(Reliable, Server, WithValidation)
-	void Server_SendTeleportLocation(FVector LocationToTeleport);
-
+    void Server_SendTeleportLocation(FVector LocationToTeleport);
 
 	// RPC that will execute on the server, sending the location to which the character will fly. We can validate if we want.
 	UFUNCTION(Reliable, Server, WithValidation)
     void Server_SetJetpackVelocity(float JetpackVelocity);
 
+	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
+	// We use a single bit of a byte to fit this boolean in the FSavedMove_Character template we will override
+	uint8 bWantsToTeleport : 1;
+	uint8 bWantsToUseJetpack : 1;
 
 	// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
 	void OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity) override;
 
+	// Teleport
 	// Location to which the character will teleport
 	FVector TeleportLocation;
 
-	// Location to which the character will be moved using the jetpack
-	FVector JetpackLocation;
+	//Distance you want to be teleported to
+	float TeleportOffset;
 
-	// We want to teleport 10m forward
-	float TeleportOffset = 1000;
+	// Jetpacking
+	float JetpackForce;
 
-	// 10 dm
-	float JetpackOffset = 10;
-	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
-	// We use a single bit of a byte to fit this boolean in the FSavedMove_Character template we will override
-	uint8 bWantsToTeleport : 1;
+	//Max hold time on jetpack
+	float MaxHoldJetpackTime;
 
-	uint8 bWantsToUseJetpack : 1;
+	//Jetpack fuel 
+	float fJetpackResource;
+
+	float JetpackFullRechargeSeconds;
 };
 
 

@@ -3,6 +3,19 @@
 #include "ShooterGame.h"
 #include "My_ShooterCharacterMovement.h"
 #include "Engine/GameEngine.h"
+#include "Math/UnrealMathUtility.h"
+
+UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
+{
+	TeleportOffset = 1000;//10m
+	JetpackForce = 1500.f;
+	MaxHoldJetpackTime = 5; //5s
+	JetpackFullRechargeSeconds = 10;
+	IsJetpacking = false;
+	fJetpackResource = 1.0;
+}
+
+
 
 bool UMy_ShooterCharacterMovement::IsClient()
 {
@@ -13,13 +26,11 @@ bool UMy_ShooterCharacterMovement::IsClient()
 void UMy_ShooterCharacterMovement::UseJetpack()
 {
 	// Calcolate the Location to teleport to
-#if UE_BUILD_DEBUG
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, " Wants to use jetpack");
-#endif
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use jetpack");
 
-	Velocity.Z = 4;
+
+	Velocity.Z += JetpackForce;
 
 	// If we are the client and we have control we send the location to the server 
 	if (IsClient())
@@ -37,7 +48,7 @@ bool UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Validate(float Jetp
 
 void UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Implementation(float JetpackVelocity)
 {
-	Velocity.Z = JetpackVelocity;
+	Velocity.Z += JetpackVelocity;
 }
 
 
@@ -75,30 +86,28 @@ void UMy_ShooterCharacterMovement::Server_SendTeleportLocation_Implementation(FV
 
 #pragma endregion 
 
-// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
-void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity)
+
+
+bool UMy_ShooterCharacterMovement::CanUseJetpack()
 {
-	if (!CharacterOwner)
-		return;
-
-	// If the player has pressed the teleport key
-	if (bWantsToTeleport)
+	//Disable jetpacking if fuel is empty
+	if (fJetpackResource <= 0)
 	{
-		bWantsToTeleport = false;
-
-		// Sweep so we avoid collisions
-		CharacterOwner->SetActorLocation(TeleportLocation, true);
+		return false;
 	}
 
-	if (bWantsToUseJetpack) 
-	{
-		bWantsToUseJetpack = false;
-
-	}
-
-	Super::OnMovementUpdated(DeltaTime, OldLocation, OldVelocity);
+	return true;
 }
 
+void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations) 
+{
+	float jetpackAcceleration = JetpackForce / Mass;
+
+	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / JetpackFullRechargeSeconds), 0, 1);
+}
+
+
+#pragma region overriden methods
 // Constructor
 UMy_ShooterCharacterMovement::FNetworkPredictionData_Client_My::FNetworkPredictionData_Client_My(const UCharacterMovementComponent& ClientMovement)
 	: Super(ClientMovement)
@@ -206,3 +215,57 @@ bool UMy_ShooterCharacterMovement::FSavedMove_My::CanCombineWith(const FSavedMov
 
 	return Super::CanCombineWith(NewMove, Character, MaxDelta);
 }
+
+
+
+void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!IsJetpacking)
+	{
+		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
+	}
+}
+
+void UMy_ShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations)
+{
+	if (IsJetpacking)
+	{
+		PhysJetpack(deltaTime, Iterations);
+	}
+
+	Super::PhysCustom(deltaTime, Iterations);
+}
+
+// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
+void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity)
+{
+	if (!CharacterOwner)
+		return;
+
+	// If the player has pressed the teleport key
+	if (bWantsToTeleport)
+	{
+		bWantsToTeleport = false;
+
+		// Sweep so we avoid collisions
+		CharacterOwner->SetActorLocation(TeleportLocation, true);
+	}
+
+	if (bWantsToUseJetpack)
+	{
+		bWantsToUseJetpack = false;
+
+		if (CanUseJetpack() == true)
+		{
+			//Change velocity
+			IsJetpacking = true;
+
+		}
+	}
+
+	Super::OnMovementUpdated(DeltaTime, OldLocation, OldVelocity);
+}
+
+#pragma endregion
