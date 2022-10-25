@@ -2,6 +2,7 @@
 
 #include "ShooterGame.h"
 #include "My_ShooterCharacterMovement.h"
+#include "Engine/GameEngine.h"
 
 bool UMy_ShooterCharacterMovement::IsClient()
 {
@@ -15,6 +16,8 @@ void UMy_ShooterCharacterMovement::UseJetpack()
 #if UE_BUILD_DEBUG
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, " Wants to use jetpack");
 #endif
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use jetpack");
 
 	Velocity.Z = 4;
 
@@ -42,6 +45,9 @@ void UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Implementation(floa
 // Function called from the input binding in the character
 void UMy_ShooterCharacterMovement::Teleport()
 {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use teleport");
+
 	TeleportLocation = PawnOwner->GetActorLocation() + PawnOwner->GetActorForwardVector() * TeleportOffset;
 
 	// If we are the client and we have control we send the location to the server 
