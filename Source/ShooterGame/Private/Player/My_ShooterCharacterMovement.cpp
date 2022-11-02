@@ -12,7 +12,6 @@ UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 	MaxHoldJetpackTime = 5; //5s
 	JetpackForce = 15000.f;
 	JetpackFullRechargeSeconds = 10;
-	IsJetpacking = false;
 	fJetpackResource = 1.0;
 }
 
@@ -96,12 +95,21 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 	return true;
 }
 
+//Is run on both server and clien
 void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations)
 {
-	if (bWantsToUseJetpack == false)
+
+
+	if (!bWantsToUseJetpack ||
+		
+		fJetpackResource <= (deltaTime / MaxHoldJetpackTime))
 	{
+		bWantsToUseJetpack = false;
+		SetMovementMode(EMovementMode::MOVE_Falling);
+		StartNewPhysics(deltaTime, Iterations);
 		return;
 	}
+
 	float resultingAccel = JetpackForce / Mass;
 	float jetpackSurplusAccel = FMath::Max<float>(0, resultingAccel + GetGravityZ());
 	float desiredTotalJetpackAccel = (GetGravityZ() * -1) + jetpackSurplusAccel;
@@ -116,7 +124,6 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 		UKismetSystemLibrary::PrintString(GetWorld(), FString("Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
 	}
 #pragma endregion
-
 
 	PhysFalling(deltaTime, Iterations);
 }
@@ -244,7 +251,7 @@ void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick Tic
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsCustomMovementMode(ECustomMovementMode::CMOVE_JETPACKING)
+	if (!IsCustomMovementMode(ECustomMovementMode::CMOVE_JETPACKING))
 	{
 		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
 	}
