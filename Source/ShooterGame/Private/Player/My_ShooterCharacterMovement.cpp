@@ -8,8 +8,8 @@
 UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 {
 	TeleportOffset = 1000;//10m
-	JetpackForce = 1500.f;
 	MaxHoldJetpackTime = 5; //5s
+	JetpackForce = 15000.f;
 	JetpackFullRechargeSeconds = 10;
 	IsJetpacking = false;
 	fJetpackResource = 1.0;
@@ -25,12 +25,10 @@ bool UMy_ShooterCharacterMovement::IsClient()
 // Function called from the input bindings in the character ( press J)
 void UMy_ShooterCharacterMovement::UseJetpack()
 {
+
 	// Calcolate the Location to teleport to
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use jetpack");
-
-
-	Velocity.Z += JetpackForce;
 
 	// If we are the client and we have control we send the location to the server 
 	if (IsClient())
@@ -56,9 +54,7 @@ void UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Implementation(floa
 // Function called from the input binding in the character
 void UMy_ShooterCharacterMovement::Teleport()
 {
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use teleport");
-
+	
 	TeleportLocation = PawnOwner->GetActorLocation() + PawnOwner->GetActorForwardVector() * TeleportOffset;
 
 	// If we are the client and we have control we send the location to the server 
@@ -101,9 +97,15 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 
 void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations) 
 {
-	float jetpackAcceleration = JetpackForce / Mass;
+	float resultingAccel = JetpackForce / Mass;
+	float jetpackSurplusAccel = FMath::Max<float>(0, resultingAccel + GetGravityZ());
+	float desiredTotalJetpackAccel = (GetGravityZ() * -1) + jetpackSurplusAccel;
 
-	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / JetpackFullRechargeSeconds), 0, 1);
+	Velocity.Z += desiredTotalJetpackAccel * deltaTime;
+
+	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, 1);
+
+	PhysFalling(deltaTime, Iterations);
 }
 
 
@@ -226,6 +228,12 @@ void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick Tic
 	{
 		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
 	}
+	else 
+	{
+		UKismetSystemLibrary::PrintString(GetWorld(), FString("Jetpack Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
+	}
+
+
 }
 
 void UMy_ShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations)
@@ -261,6 +269,11 @@ void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVec
 		{
 			//Change velocity
 			IsJetpacking = true;
+			SetMovementMode(MOVE_Falling);
+		}
+		else
+		{
+			IsJetpacking = false;
 
 		}
 	}
