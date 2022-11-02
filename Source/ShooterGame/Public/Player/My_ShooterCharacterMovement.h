@@ -22,7 +22,7 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 	*/
 
 	// We create our own Move from the standard that Unreal uses (FSavedMove_Character)
-		class FSavedMove_My : public FSavedMove_Character
+    class FSavedMove_My : public FSavedMove_Character
 	{
 	public:
 		//So we can use Super::

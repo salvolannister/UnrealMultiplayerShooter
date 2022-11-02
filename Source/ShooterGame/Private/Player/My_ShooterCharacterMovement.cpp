@@ -4,6 +4,7 @@
 #include "My_ShooterCharacterMovement.h"
 #include "Engine/GameEngine.h"
 #include "Math/UnrealMathUtility.h"
+#include "ECustomMovementMode.h"
 
 UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 {
@@ -54,7 +55,7 @@ void UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Implementation(floa
 // Function called from the input binding in the character
 void UMy_ShooterCharacterMovement::Teleport()
 {
-	
+
 	TeleportLocation = PawnOwner->GetActorLocation() + PawnOwner->GetActorForwardVector() * TeleportOffset;
 
 	// If we are the client and we have control we send the location to the server 
@@ -95,7 +96,7 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 	return true;
 }
 
-void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations) 
+void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations)
 {
 	float resultingAccel = JetpackForce / Mass;
 	float jetpackSurplusAccel = FMath::Max<float>(0, resultingAccel + GetGravityZ());
@@ -104,6 +105,14 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 	Velocity.Z += desiredTotalJetpackAccel * deltaTime;
 
 	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, 1);
+#pragma region print Velocity
+	if (GetPawnOwner()->IsLocallyControlled())
+	{
+		UKismetSystemLibrary::PrintString(GetWorld(), FString("Speed: ") + FString::SanitizeFloat(Velocity.Size()), true, false, FLinearColor::Red, 0.0);
+		UKismetSystemLibrary::PrintString(GetWorld(), FString("Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
+	}
+#pragma endregion
+
 
 	PhysFalling(deltaTime, Iterations);
 }
@@ -174,6 +183,8 @@ void UMy_ShooterCharacterMovement::UpdateFromCompressedFlags(uint8 Flags)
 
 	// Take the data from our custom flag and save it to our variable.
 	bWantsToTeleport = (Flags & FSavedMove_Character::FLAG_Custom_1) != 0;
+
+	bWantsToUseJetpack = (Flags & FSavedMove_Character::FLAG_Custom_2) != 0;
 }
 
 void UMy_ShooterCharacterMovement::FSavedMove_My::Clear()
@@ -182,6 +193,8 @@ void UMy_ShooterCharacterMovement::FSavedMove_My::Clear()
 
 	// Reset the Move
 	bSavedWantsToTeleport = false;
+
+	bSavedWantsToUseJetpack = false;
 }
 
 // This function returns a byte containing our flags.
@@ -228,7 +241,7 @@ void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick Tic
 	{
 		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
 	}
-	else 
+	else
 	{
 		UKismetSystemLibrary::PrintString(GetWorld(), FString("Jetpack Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
 	}
@@ -238,9 +251,25 @@ void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick Tic
 
 void UMy_ShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations)
 {
+	// Physic simulation shouldn't run on simulated proxy so we check and return it 
+	if (GetOwner()->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		return;
+	}
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Phys Custom");
+
+	switch (CustomMovementMode)
+	{
+		case ECustomMovementMode::CMOVE_JETPACKING:
+		{
+			PhysJetpack(deltaTime, Iterations);
+		}
+	}
 	if (IsJetpacking)
 	{
-		PhysJetpack(deltaTime, Iterations);
+		
 	}
 
 	Super::PhysCustom(deltaTime, Iterations);
@@ -263,19 +292,12 @@ void UMy_ShooterCharacterMovement::OnMovementUpdated(float DeltaTime, const FVec
 
 	if (bWantsToUseJetpack)
 	{
-		bWantsToUseJetpack = false;
 
 		if (CanUseJetpack() == true)
 		{
-			//Change velocity
-			IsJetpacking = true;
-			SetMovementMode(MOVE_Falling);
+			SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CMOVE_JETPACKING);
 		}
-		else
-		{
-			IsJetpacking = false;
-
-		}
+		
 	}
 
 	Super::OnMovementUpdated(DeltaTime, OldLocation, OldVelocity);
