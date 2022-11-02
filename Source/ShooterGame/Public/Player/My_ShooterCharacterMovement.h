@@ -90,8 +90,7 @@ public:
 	void UseJetpack();
 	bool IsClient();
 	bool CanUseJetpack();
-
-	bool IsJetpacking;
+	bool IsCustomMovementMode(uint8 customMove) const;
 private:
 	// Function to decompress flags from a saved Move
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;

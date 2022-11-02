@@ -98,6 +98,10 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 
 void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations)
 {
+	if (bWantsToUseJetpack == false)
+	{
+		return;
+	}
 	float resultingAccel = JetpackForce / Mass;
 	float jetpackSurplusAccel = FMath::Max<float>(0, resultingAccel + GetGravityZ());
 	float desiredTotalJetpackAccel = (GetGravityZ() * -1) + jetpackSurplusAccel;
@@ -231,13 +235,16 @@ bool UMy_ShooterCharacterMovement::FSavedMove_My::CanCombineWith(const FSavedMov
 	return Super::CanCombineWith(NewMove, Character, MaxDelta);
 }
 
-
+bool UMy_ShooterCharacterMovement::IsCustomMovementMode(uint8 customMove) const
+{
+	return MovementMode == EMovementMode::MOVE_Custom && CustomMovementMode == customMove;
+}
 
 void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsJetpacking)
+	if (!IsCustomMovementMode(ECustomMovementMode::CMOVE_JETPACKING)
 	{
 		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
 	}
@@ -267,10 +274,7 @@ void UMy_ShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations)
 			PhysJetpack(deltaTime, Iterations);
 		}
 	}
-	if (IsJetpacking)
-	{
-		
-	}
+
 
 	Super::PhysCustom(deltaTime, Iterations);
 }
