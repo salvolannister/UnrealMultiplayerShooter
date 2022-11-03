@@ -14,8 +14,8 @@ AMyShooterHUD::AMyShooterHUD()
 void AMyShooterHUD::DrawJetpackFuel()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(PlayerOwner);
-	My_ShooterCharacter* MyCharacter = Cast<My_ShooterCharacter>(MyPC->GetCharacter());
-	My_ShooterCharacterMovement* CharMov = Cast<My_ShooterCharacterMovement>(MyCharacter->GetMyMovementComponent());
+	AMy_ShooterCharacter* MyCharacter = Cast<AMy_ShooterCharacter>(MyPC->GetCharacter());
+	UMy_ShooterCharacterMovement* CharMov = Cast<UMy_ShooterCharacterMovement>(MyCharacter->GetMyMovementComponent());
 	if (!CharMov)
 		return;
 
@@ -28,8 +28,8 @@ void AMyShooterHUD::DrawJetpackFuel()
 	Canvas->DrawIcon(JetpackFuelBarBg, JetpackFuelPosX, JetpackFuelPosY, ScaleUI * JetpackScaleMul);
 
 	float currentFuel = CharMov->GetJetpackResource();
-	float totalFuel = CharMov->GetJetpackFullResouce();
-	const float FuelAmount = FMath::Min(1, currentFuel / totalFuel);
+	float totalFuel = CharMov->GetJetpackFullResource();
+	const float FuelAmount = FMath::Min(1.0f, currentFuel / totalFuel);
 
 	FCanvasTileItem TileItem(FVector2D(JetpackFuelPosX, JetpackFuelPosY), JetpackFuelBar.Texture->Resource,
 	FVector2D(JetpackFuelBar.UL * FuelAmount * ScaleUI * JetpackScaleMul, JetpackFuelBar.VL * ScaleUI * JetpackScaleMul), FLinearColor::White);
