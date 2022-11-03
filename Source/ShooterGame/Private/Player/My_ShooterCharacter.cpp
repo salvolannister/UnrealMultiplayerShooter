@@ -22,7 +22,7 @@ void AMy_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// Binding for jetpack
 	PlayerInputComponent->BindAction("UseJetpack", IE_Pressed, this, &AMy_ShooterCharacter::UseJetpack);
 	// IE_Released stop jetpacking 
-
+	PlayerInputComponent->BindAction("UseJetpack", EInputEvent::IE_Released, this, &AMy_ShooterCharacter::StopJetpacking);
 }
 
 // Function that will call the Teleport implementation in the Movement Component
@@ -40,6 +40,15 @@ void AMy_ShooterCharacter::UseJetpack()
 	{
 		Super::Jump();
 		GetMyMovementComponent()->UseJetpack();
+	}
+}
+
+void AMy_ShooterCharacter::StopJetpacking()
+{
+	if (GetMyMovementComponent())
+	{
+		Super::StopJumping();
+		GetMyMovementComponent()->StopJetpacking();
 	}
 }
 

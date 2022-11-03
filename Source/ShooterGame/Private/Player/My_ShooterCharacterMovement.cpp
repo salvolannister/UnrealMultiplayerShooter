@@ -38,6 +38,23 @@ void UMy_ShooterCharacterMovement::UseJetpack()
 	bWantsToUseJetpack = true;
 }
 
+void UMy_ShooterCharacterMovement::StopJetpacking()
+{
+
+	// Calcolate the Location to teleport to
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to stop using jetpack");
+
+	// If we are the client and we have control we send the location to the server 
+	if (IsClient())
+		Server_SetJetpackVelocity(Velocity.Z);
+
+	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
+	bWantsToUseJetpack = false;
+}
+
+
+
 //TODO: implement a check to avoid cheater tricks
 bool UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Validate(float JetpackVelocity)
 {

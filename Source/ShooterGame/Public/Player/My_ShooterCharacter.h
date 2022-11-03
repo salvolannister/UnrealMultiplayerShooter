@@ -30,6 +30,8 @@ private:
 	void Teleport();
 	// Function that will call teh Jetpack implementation in the Movement Component
 	void UseJetpack();
+	// Funciton called when the jetpacking button is realesed
+	void StopJetpacking();
 };
 
 

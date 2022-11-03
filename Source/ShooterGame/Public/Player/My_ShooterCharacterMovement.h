@@ -88,6 +88,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Custom Character Movement")
     void Teleport();
 	void UseJetpack();
+	void StopJetpacking();
 	bool IsClient();
 	bool CanUseJetpack();
 	bool IsCustomMovementMode(uint8 customMove) const;
