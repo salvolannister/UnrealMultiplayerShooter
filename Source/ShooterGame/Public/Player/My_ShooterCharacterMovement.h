@@ -92,6 +92,9 @@ public:
 	bool IsClient();
 	bool CanUseJetpack();
 	bool IsCustomMovementMode(uint8 customMove) const;
+	float GetJetpackResource();
+	float GetJetpackFullResource();
+
 private:
 	// Function to decompress flags from a saved Move
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
@@ -137,6 +140,9 @@ private:
 
 	//Jetpack fuel 
 	float fJetpackResource;
+
+	//Jetpack max fuel
+	float fJetpackFullResource;
 
 	float JetpackFullRechargeSeconds;
 };

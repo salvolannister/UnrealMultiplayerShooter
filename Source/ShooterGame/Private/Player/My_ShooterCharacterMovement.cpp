@@ -12,6 +12,7 @@ UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 	MaxHoldJetpackTime = 5; //5s
 	JetpackForce = 15000.f;
 	JetpackFullRechargeSeconds = 10;
+	fJetpackFullResource = 1.0;
 	fJetpackResource = 1.0;
 }
 
@@ -53,7 +54,15 @@ void UMy_ShooterCharacterMovement::StopJetpacking()
 	bWantsToUseJetpack = false;
 }
 
+float UMy_ShooterCharacterMovement::GetJetpackResource()
+{
+	return fJetpackResource;
+}
 
+float UMy_ShooterCharacterMovement::GetJetpackFullResource()
+{
+	return fJetpackFullResource;
+}
 
 //TODO: implement a check to avoid cheater tricks
 bool UMy_ShooterCharacterMovement::Server_SetJetpackVelocity_Validate(float JetpackVelocity)
@@ -133,7 +142,7 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 
 	Velocity.Z += desiredTotalJetpackAccel * deltaTime;
 
-	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, 1);
+	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, fJetpackFullResource);
 #pragma region print Velocity
 	if (GetPawnOwner()->IsLocallyControlled())
 	{
