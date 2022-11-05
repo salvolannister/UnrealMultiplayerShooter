@@ -25,13 +25,38 @@ public:
 private:
 	// Input binding is set in the character in the original project, overriding this method let us expand those bindings
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// Function that will call the Teleport implementation in the Movement Component
 	void Teleport();
 	// Function that will call teh Jetpack implementation in the Movement Component
 	void UseJetpack();
 	// Funciton called when the jetpacking button is realesed
 	void StopJetpacking();
+	// Function called when the player dies and has a weapon with ammo greater than zero
+	void DropWeapon();
+	// Function called when the player picks up a weapon
+	void PickWeapon();
+	/** [server RPC] Drops the currently equipped gun as pickup */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerDropWeapon();
+
+
+	TSubclassOf<class AShooterPickup_Ammo> ShooterPickupDroppedGunClass;
+
+	/** Weapon type: rifle */
+	TSubclassOf<class AShooterWeapon> WeaponTypeRifle;
+
+	/** Weapon type: rocket launcher */
+	TSubclassOf<class AShooterWeapon> WeaponTypeRocketLauncher;
+
+	// Add new weapon here
+
+
+
+protected:
+
+	virtual void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser) override;
+
+
 };
 
 
