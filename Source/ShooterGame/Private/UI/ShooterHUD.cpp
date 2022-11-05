@@ -13,6 +13,8 @@
 #include "OnlineSubsystemUtils.h"
 #include "ShooterGameUserSettings.h"
 #include "Performance/LatencyMarkerModule.h"
+#include "My_ShooterCharacter.h"
+#include "My_ShooterCharacterMovement.h"
 
 #define LOCTEXT_NAMESPACE "ShooterGame.HUD.Menu"
 
@@ -37,6 +39,8 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDMainTextureOb(TEXT("/Game/UI/HUD/HUDMain"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDAssets02TextureOb(TEXT("/Game/UI/HUD/HUDAssets02"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LowHealthOverlayTextureOb(TEXT("/Game/UI/HUD/LowHealthOverlay"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDJetpackTextureOb(TEXT("/Game/UI/HUD/HUDjetpack"));
+
 
 	// Fonts are not included in dedicated server builds.
 	#if !UE_SERVER
@@ -52,6 +56,9 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	HUDMainTexture = HUDMainTextureOb.Object;
 	HUDAssets02Texture = HUDAssets02TextureOb.Object;
 	LowHealthOverlayTexture = LowHealthOverlayTextureOb.Object;
+	HUDJetpackTexture = HUDJetpackTextureOb.Object;
+
+
 
 	HitNotifyIcon[EShooterHudPosition::Left] = UCanvas::MakeIcon(HitNotifyTexture,  158, 831, 585, 392);	
 	HitNotifyIcon[EShooterHudPosition::FrontLeft] = UCanvas::MakeIcon(HitNotifyTexture, 369, 434, 460, 378);	
@@ -70,6 +77,9 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	DeathMessagesBg = UCanvas::MakeIcon(HUDMainTexture, 502, 177, 342, 187);
 	HealthBar = UCanvas::MakeIcon(HUDAssets02Texture, 67, 212, 372, 50);
 	HealthBarBg = UCanvas::MakeIcon(HUDAssets02Texture, 67, 162, 372, 50);
+
+	JetpackFuelBar = UCanvas::MakeIcon(HUDJetpackTexture, 67, 212, 372, 50);
+	JetpackFuelBarBg = UCanvas::MakeIcon(HUDJetpackTexture, 67, 162, 372, 50);
 
 	HealthIcon = UCanvas::MakeIcon(HUDAssets02Texture, 78, 262, 28, 28);
 	KillsIcon = UCanvas::MakeIcon(HUDMainTexture, 318, 93, 24, 24);
@@ -336,6 +346,34 @@ void AShooterHUD::DrawHealth()
 	Canvas->DrawItem(TileItem);
 
 	Canvas->DrawIcon(HealthIcon,HealthPosX + Offset * ScaleUI, HealthPosY + (HealthBar.VL - HealthIcon.VL) / 2.0f * ScaleUI, ScaleUI);
+}
+
+void AShooterHUD::DrawJetpackFuel()
+{
+	//TODO: try to save CharMov variable globally
+	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(PlayerOwner);
+	AMy_ShooterCharacter* MyCharacter = Cast<AMy_ShooterCharacter>(MyPC->GetCharacter());
+	UMy_ShooterCharacterMovement* CharMov = Cast<UMy_ShooterCharacterMovement>(MyCharacter->GetMyMovementComponent());
+	if (!CharMov)
+		return;
+
+	const float JetpackOffsetY = 75.0f;
+	const float JetpackScaleMul = 0.75f;
+
+	Canvas->SetDrawColor(FColor::White);
+	const float JetpackFuelPosX = (Canvas->ClipX - JetpackFuelBarBg.UL * ScaleUI * JetpackScaleMul) / 2;
+	const float JetpackFuelPosY = Canvas->ClipY - (Offset + JetpackFuelBarBg.VL + JetpackOffsetY) * ScaleUI * JetpackScaleMul;
+	Canvas->DrawIcon(JetpackFuelBarBg, JetpackFuelPosX, JetpackFuelPosY, ScaleUI * JetpackScaleMul);
+
+	float currentFuel = CharMov->GetJetpackResource();
+	float totalFuel = CharMov->GetJetpackFullResource();
+	const float FuelAmount = FMath::Min(1.0f, currentFuel / totalFuel);
+
+	FCanvasTileItem TileItem(FVector2D(JetpackFuelPosX, JetpackFuelPosY), JetpackFuelBar.Texture->Resource,
+	FVector2D(JetpackFuelBar.UL * FuelAmount * ScaleUI * JetpackScaleMul, JetpackFuelBar.VL * ScaleUI * JetpackScaleMul), FLinearColor::White);
+	MakeUV(JetpackFuelBar, TileItem.UV0, TileItem.UV1, JetpackFuelBar.U, JetpackFuelBar.V, JetpackFuelBar.UL * FuelAmount, JetpackFuelBar.VL);
+	TileItem.BlendMode = SE_BLEND_Translucent;
+	Canvas->DrawItem(TileItem);
 }
 
 void AShooterHUD::DrawNVIDIAReflexTimers()
@@ -645,6 +683,7 @@ void AShooterHUD::DrawHUD()
 		{
 			DrawHealth();
 			DrawWeaponHUD();
+			DrawJetpackFuel();
 		}
 		else
 		{
