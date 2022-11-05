@@ -11,3 +11,4 @@ https://youtu.be/Of8SGBa3WvU?t=340
 video implementing jetpack: https://www.youtube.com/watch?v=DoZyH86n_gs
 video explaining networking in unreal and saved move: https://www.youtube.com/watch?v=Of8SGBa3WvU
 To debug network connection prediction launch in the output log: "> p.NetShowCorrections 1"
+github containing interesting code https://github.com/HarryPearce/JetpackTutorial
