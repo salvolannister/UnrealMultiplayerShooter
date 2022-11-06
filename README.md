@@ -1,5 +1,13 @@
 # unreal-shooter-game-ex-one
-Shooter game made with Unreal 5
+Exercise to show ability in coding based in adding features to the base template from unreal " ....".
+Features (networked) added by now:
+- Jetpack:
+You can hold "J" to use the jetpack until the fuel showed by the green bar is expired
+- Teleport:
+You can press "T" to teleport yourself 10 m haed
+- Drop Weapon:
+When the player dies it will drop the weapon that could be collected by other players. The gun dropped
+is the same the player was using with its current loaded and not loaded clips.
 
 #TODO
 [IMPROVEMENT] save mymovement component in a variable inside My_ShooterCharacter so 
