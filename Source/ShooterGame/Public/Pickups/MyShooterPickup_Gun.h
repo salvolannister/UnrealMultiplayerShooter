@@ -64,7 +64,7 @@ protected:
 
 	/** how much this pickup lives? */
 	UPROPERTY(EditDefaultsOnly, Category = Pickup)
-	float LifeTime = 10.0f;
+	float LifeTime = 100.0f;
 
 	/** Returns Pickup Mesh Component subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetPickupMesh() const { return PickupMesh; }
