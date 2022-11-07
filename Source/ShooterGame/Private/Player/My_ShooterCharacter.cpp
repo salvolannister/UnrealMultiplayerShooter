@@ -69,6 +69,7 @@ void AMy_ShooterCharacter::DropWeapon()
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
+	
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	//Instantiates the pickup ammo
 	AMyShooterPickup_Gun* DroppedGun = Cast<AMyShooterPickup_Gun>(GetWorld()->SpawnActor<AActor>(ShooterPickupDroppedGunClass, GetActorLocation(), GetActorRotation(), SpawnParams));
@@ -92,11 +93,23 @@ void AMy_ShooterCharacter::DropWeapon()
 	DroppedGun->SetWeaponType(WeapType);
 }
 
-void AMy_ShooterCharacter::PickWeapon()
+void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
 	//Check if u can pick it up
 	// update ammo 
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying weapon implementation");
 
+	MulticastRPCDestroyWeapon(gun);
+}
+
+void AMy_ShooterCharacter::MulticastRPCDestroyWeapon_Implementation(AMyShooterPickup_Gun* gun) 
+{
+	gun->Destroy();
+}
+
+bool AMy_ShooterCharacter::ServerTakeWeapon_Validate(AMyShooterPickup_Gun* gun)
+{
+	return true;
 }
 
 bool AMy_ShooterCharacter::ServerDropWeapon_Validate()

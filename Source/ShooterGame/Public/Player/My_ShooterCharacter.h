@@ -22,6 +22,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	UMy_ShooterCharacterMovement* GetMyMovementComponent() const;
 
+
+	UFUNCTION(unreliable, server, WithValidation)
+	void ServerTakeWeapon(AMyShooterPickup_Gun *weapon);
+
+	UFUNCTION(NetMulticast, reliable)
+	void MulticastRPCDestroyWeapon(AMyShooterPickup_Gun* weapon);
+
 private:
 	// Input binding is set in the character in the original project, overriding this method let us expand those bindings
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -38,7 +45,6 @@ private:
 	/** [server RPC] Drops the currently equipped gun as pickup */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerDropWeapon();
-
 
 	TSubclassOf<class AShooterPickup_Ammo> ShooterPickupDroppedGunClass;
 

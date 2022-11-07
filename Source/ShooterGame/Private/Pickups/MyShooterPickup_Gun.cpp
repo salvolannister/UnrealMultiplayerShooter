@@ -3,6 +3,7 @@
 #include "ShooterGame.h"
 #include "Pickups/MyShooterPickup_Gun.h"
 #include "OnlineSubsystemUtils.h"
+#include <My_ShooterCharacter.h>
 
 /* The MaskMesh object is replicated setting to "Replicate" in the property, using the method "GetLifetimeReplicatedProps" and ensuring that the
 constructor sets bReplicates to true*/
@@ -15,10 +16,11 @@ AMyShooterPickup_Gun::AMyShooterPickup_Gun(const FObjectInitializer& ObjectIniti
 	PickupMesh = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PickupMesh"));
 	PickupMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
+	RespawnTime = 0;
 }
 
 
-void AMyShooterPickup_Gun::OnRep_MaskMesh() 
+void AMyShooterPickup_Gun::OnRep_MaskMesh()
 {
 	SetWeaponPickupMesh(MaskMesh);
 }
@@ -28,23 +30,23 @@ void AMyShooterPickup_Gun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Tells the network when to replicate the variables
-	DOREPLIFETIME(AMyShooterPickup_Gun, MaskMesh);  
+	DOREPLIFETIME(AMyShooterPickup_Gun, MaskMesh);
 }
 
-void AMyShooterPickup_Gun::SetAmmoClips(int32 Clips) 
+void AMyShooterPickup_Gun::SetAmmoClips(int32 Clips)
 {
 	AmmoClips = Clips;
 }
 
-void AMyShooterPickup_Gun::SetAmmoLoadedClip(int32 LoadedClips) 
+void AMyShooterPickup_Gun::SetAmmoLoadedClip(int32 LoadedClips)
 {
 	AmmoLoadedClip = LoadedClips;
 }
-void AMyShooterPickup_Gun::SetWeaponType(TSubclassOf<AShooterWeapon> Type) 
+void AMyShooterPickup_Gun::SetWeaponType(TSubclassOf<AShooterWeapon> Type)
 {
 	WeaponType = Type;
 }
-void AMyShooterPickup_Gun::SetWeaponPickupMesh(USkeletalMesh* WeaponMesh) 
+void AMyShooterPickup_Gun::SetWeaponPickupMesh(USkeletalMesh* WeaponMesh)
 {
 	PickupMesh->SetSkeletalMesh(WeaponMesh, false);
 }
@@ -114,5 +116,25 @@ void AMyShooterPickup_Gun::OnPickedUp()
 {
 	Super::OnPickedUp();
 
-	Destroy();
+	
+		AMy_ShooterCharacter* MSC = Cast<AMy_ShooterCharacter>(PickedUpBy);
+		if (MSC != NULL)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling from locally controlled character");
+			if (MSC->GetLocalRole() == ROLE_Authority)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling Destroy from server");
+				Destroy();
+			}
+			else if (MSC->IsLocallyControlled())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling RPC");
+
+				MSC->ServerTakeWeapon(this);
+			}
+		}
 }
+
+
+
+
