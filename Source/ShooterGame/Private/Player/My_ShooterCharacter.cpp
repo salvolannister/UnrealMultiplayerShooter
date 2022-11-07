@@ -68,29 +68,37 @@ void AMy_ShooterCharacter::StopJetpacking()
 void AMy_ShooterCharacter::DropWeapon()
 {
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	
+	SpawnParams.Owner = this;	
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FTransform SpawnTS(GetActorRotation(), GetActorLocation());
 	//Instantiates the pickup ammo
-	AMyShooterPickup_Gun* DroppedGun = Cast<AMyShooterPickup_Gun>(GetWorld()->SpawnActor<AActor>(ShooterPickupDroppedGunClass, GetActorLocation(), GetActorRotation(), SpawnParams));
-	//Sets the mesh and clips
-	AShooterWeapon* EquippedWeapon = GetWeapon();
-	const int32 CurrentAmmo = EquippedWeapon->GetCurrentAmmo();
-	DroppedGun->SetAmmoClips(CurrentAmmo / EquippedWeapon->GetAmmoPerClip());
-	DroppedGun->SetAmmoLoadedClip(CurrentAmmo % EquippedWeapon->GetAmmoPerClip());
-	DroppedGun->MaskMesh = EquippedWeapon->GetWeaponMesh()->SkeletalMesh; // mask variable to trigger OnRep call
-	DroppedGun->SetWeaponPickupMesh(DroppedGun->MaskMesh); // update mesh when called by the server
-	TSubclassOf<class AShooterWeapon> WeapType;
-	switch (EquippedWeapon->GetAmmoType())
+	AMyShooterPickup_Gun* DroppedGun = Cast<AMyShooterPickup_Gun>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, ShooterPickupDroppedGunClass, SpawnTS, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
+	
+	
+	if (DroppedGun)
 	{
+		//Sets the mesh and clips
+		AShooterWeapon* EquippedWeapon = GetWeapon();
+		const int32 CurrentAmmo = EquippedWeapon->GetCurrentAmmo();
+		DroppedGun->SetAmmoClips(CurrentAmmo / EquippedWeapon->GetAmmoPerClip());
+		DroppedGun->SetAmmoLoadedClip(CurrentAmmo % EquippedWeapon->GetAmmoPerClip());
+		DroppedGun->MaskMesh = EquippedWeapon->GetWeaponMesh()->SkeletalMesh; // mask variable to trigger OnRep call
+		DroppedGun->SetWeaponPickupMesh(DroppedGun->MaskMesh); // update mesh when called by the server
+		TSubclassOf<class AShooterWeapon> WeapType;
+		switch (EquippedWeapon->GetAmmoType())
+		{
 		case AShooterWeapon::EAmmoType::EBullet:
 			WeapType = WeaponTypeRifle;
 			break;
 		case AShooterWeapon::EAmmoType::ERocket:
 			WeapType = WeaponTypeRocketLauncher;
 			break;
+		}
+		DroppedGun->SetWeaponType(WeapType);
+
+		UGameplayStatics::FinishSpawningActor(DroppedGun, SpawnTS);
 	}
-	DroppedGun->SetWeaponType(WeapType);
+	
 }
 
 void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
