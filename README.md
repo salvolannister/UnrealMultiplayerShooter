@@ -10,9 +10,11 @@ When the player dies it will drop the weapon that could be collected by other pl
 is the same the player was using with its current loaded and not loaded clips.
 
 #TODO
-[IMPROVEMENT] save mymovement component in a variable inside My_ShooterCharacter so 
+- Implement wall run
+- [IMPROVEMENT] Save mymovement component in a variable inside My_ShooterCharacter so 
 that I won't need to cast it every time I ask for it
 https://youtu.be/Of8SGBa3WvU?t=340
+- [IMPROVEMENT] Implement client prediction for dropped gun
 
 
 #USEFULL MATERIAL
@@ -20,3 +22,4 @@ video implementing jetpack: https://www.youtube.com/watch?v=DoZyH86n_gs
 video explaining networking in unreal and saved move: https://www.youtube.com/watch?v=Of8SGBa3WvU
 To debug network connection prediction launch in the output log: "> p.NetShowCorrections 1"
 github containing interesting code https://github.com/HarryPearce/JetpackTutorial
+tips on networking https://schmigel.medium.com/unreal-engine-multiplayer-tips-c10a0c2efe40
