@@ -68,13 +68,13 @@ void AMy_ShooterCharacter::StopJetpacking()
 void AMy_ShooterCharacter::DropWeapon()
 {
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;	
+	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FTransform SpawnTS(GetActorRotation(), GetActorLocation());
 	//Instantiates the pickup ammo
 	AMyShooterPickup_Gun* DroppedGun = Cast<AMyShooterPickup_Gun>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, ShooterPickupDroppedGunClass, SpawnTS, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
-	
-	
+
+
 	if (DroppedGun)
 	{
 		//Sets the mesh and clips
@@ -98,7 +98,7 @@ void AMy_ShooterCharacter::DropWeapon()
 
 		UGameplayStatics::FinishSpawningActor(DroppedGun, SpawnTS);
 	}
-	
+
 }
 
 void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
@@ -110,9 +110,16 @@ void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun*
 	MulticastRPCDestroyWeapon(gun);
 }
 
-void AMy_ShooterCharacter::MulticastRPCDestroyWeapon_Implementation(AMyShooterPickup_Gun* gun) 
+void AMy_ShooterCharacter::MulticastRPCDestroyWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
-	gun->Destroy();
+
+	if (IsValid(gun)) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying gun inside multicast function");
+		GetWorld()->DestroyActor(gun);
+	}
+
+
 }
 
 bool AMy_ShooterCharacter::ServerTakeWeapon_Validate(AMyShooterPickup_Gun* gun)
@@ -140,7 +147,7 @@ void AMy_ShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent cons
 		return;
 	}
 
-	if(GetLocalRole() == ROLE_Authority)
+	if (GetLocalRole() == ROLE_Authority)
 		DropWeapon();
 	else
 		ServerDropWeapon();
