@@ -122,16 +122,10 @@ void AMyShooterPickup_Gun::OnPickedUp()
 	{
 		if (MSC->GetLocalRole() == ROLE_Authority)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling Destroy from server");
 			Destroy();
 		}
 		else
 		{
-			if (GetWorld()->IsServer()) {
-				return;
-			}
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Calling RPC");
-
 			MSC->ServerTakeWeapon(this);
 		}
 	}

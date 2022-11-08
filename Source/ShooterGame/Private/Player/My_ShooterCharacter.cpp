@@ -106,7 +106,6 @@ void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun*
 
 	
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying weapon implementation");
 	MulticastRPCDestroyWeapon(gun);
 
 }
@@ -116,7 +115,6 @@ void AMy_ShooterCharacter::MulticastRPCDestroyWeapon_Implementation(AMyShooterPi
 
 	if (IsValid(gun))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Destroying gun inside multicast function");
 		GetWorld()->DestroyActor(gun);
 	}
 
