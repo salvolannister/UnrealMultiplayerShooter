@@ -103,19 +103,20 @@ void AMy_ShooterCharacter::DropWeapon()
 
 void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
-	//Check if u can pick it up
-	// update ammo 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying weapon implementation");
 
+	
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying weapon implementation");
 	MulticastRPCDestroyWeapon(gun);
+
 }
 
 void AMy_ShooterCharacter::MulticastRPCDestroyWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
 
-	if (IsValid(gun)) 
+	if (IsValid(gun))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Destroying gun inside multicast function");
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Destroying gun inside multicast function");
 		GetWorld()->DestroyActor(gun);
 	}
 

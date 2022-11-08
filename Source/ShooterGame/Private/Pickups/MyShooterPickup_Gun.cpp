@@ -117,22 +117,24 @@ void AMyShooterPickup_Gun::OnPickedUp()
 	Super::OnPickedUp();
 
 	
-		AMy_ShooterCharacter* MSC = Cast<AMy_ShooterCharacter>(PickedUpBy);
-		if (MSC != NULL)
+	AMy_ShooterCharacter* MSC = Cast<AMy_ShooterCharacter>(PickedUpBy);
+	if (MSC != NULL)
+	{
+		if (MSC->GetLocalRole() == ROLE_Authority)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling from locally controlled character");
-			if (MSC->GetLocalRole() == ROLE_Authority)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling Destroy from server");
-				Destroy();
-			}
-			else if (MSC->IsLocallyControlled())
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling RPC");
-
-				MSC->ServerTakeWeapon(this);
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Calling Destroy from server");
+			Destroy();
 		}
+		else
+		{
+			if (GetWorld()->IsServer()) {
+				return;
+			}
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Calling RPC");
+
+			MSC->ServerTakeWeapon(this);
+		}
+	}
 }
 
 
