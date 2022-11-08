@@ -116,7 +116,9 @@ void AMyShooterPickup_Gun::OnPickedUp()
 {
 	Super::OnPickedUp();
 
-	
+	// Since the base class Actor it's already set to be replicated and U4 has no poblem in
+	// replicating a destroy we could just call Destroy. 
+	// This was my effort to avoid seeing the gun going away after few seconds because there is no client prediction implemented
 	AMy_ShooterCharacter* MSC = Cast<AMy_ShooterCharacter>(PickedUpBy);
 	if (MSC != NULL)
 	{
