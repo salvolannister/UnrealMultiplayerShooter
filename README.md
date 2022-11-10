@@ -10,7 +10,12 @@ When the player dies it will drop the weapon that could be collected by other pl
 is the same the player was using with its current loaded and not loaded clips.
 
 #TODO
-- Implement wall run
+- Shrink gun: when hitting an opponent with this weapon it gets tiny (about 20cm tall)
+for a specific amount of time. If during this time another player stomps on him, then
+he dies. The shrinking, and eventually subsequent rescaling, must be interpolated.
+The amount of remaining time shrinked must appear properly on the HUD of the
+affected player. Proper graphic effect is a plus.
+
 - [IMPROVEMENT] Save mymovement component in a variable inside My_ShooterCharacter so 
 that I won't need to cast it every time I ask for it
 https://youtu.be/Of8SGBa3WvU?t=340
