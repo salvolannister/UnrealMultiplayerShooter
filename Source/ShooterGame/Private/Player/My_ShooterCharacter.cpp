@@ -17,7 +17,8 @@ AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& Objec
 	WeaponTypeRifle = BPClassFinder2.Class;
 	static ConstructorHelpers::FClassFinder<AShooterWeapon> BPClassFinder3(TEXT("/Game/Blueprints/Weapons/WeapLauncher"));
 	WeaponTypeRocketLauncher = BPClassFinder3.Class;
-
+	static ConstructorHelpers::FClassFinder<AShooterPickup_Ammo> BPClassFinder4(TEXT("/Game/Blueprints/Weapons/WeapShrinker"));
+	WeaponTypeShrinkLauncher = BPClassFinder4.Class;
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -103,9 +104,6 @@ void AMy_ShooterCharacter::DropWeapon()
 
 void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
-
-	
-
 	MulticastRPCDestroyWeapon(gun);
 
 }
@@ -152,6 +150,22 @@ void AMy_ShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent cons
 		ServerDropWeapon();
 
 	Super::OnDeath(KillingDamage, DamageEvent, PawnInstigator, DamageCauser);
+}
+
+float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) 
+{
+	//Call it here so if PC is in God Mode he/she returns
+	float const ActualDamage = Super::TakeDamage(Damage,DamageEvent, EventInstigator, DamageCauser);
+
+	if ((DamageEvent.DamageTypeClass->GetName()).Equals("DmgType_Shrink"))
+	{
+
+		return 0.0; // no damage given from the shrinking ammo
+	}
+	else
+	{
+		return ActualDamage;
+	}
 }
 
 // Function for get our Movement Component 
