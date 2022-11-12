@@ -53,15 +53,15 @@ private:
 
 	/** Weapon type: rocket launcher */
 	TSubclassOf<class AShooterWeapon> WeaponTypeRocketLauncher;
-
+	/** Weapon type is a shrink rocket launcher*/
+	TSubclassOf<class AShooterWeapon> WeaponTypeShrinkLauncher;
 	// Add new weapon here
-
 
 
 protected:
 
 	virtual void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser) override;
-
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
 };
 

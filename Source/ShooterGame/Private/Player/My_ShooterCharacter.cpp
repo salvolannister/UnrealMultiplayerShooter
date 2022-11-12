@@ -154,8 +154,12 @@ void AMy_ShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent cons
 
 float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) 
 {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage is " + (DamageEvent.DamageTypeClass->GetName()));
+
 	//Call it here so if PC is in God Mode he/she returns
 	float const ActualDamage = Super::TakeDamage(Damage,DamageEvent, EventInstigator, DamageCauser);
+
 
 	if ((DamageEvent.DamageTypeClass->GetName()).Equals("DmgType_Shrink"))
 	{

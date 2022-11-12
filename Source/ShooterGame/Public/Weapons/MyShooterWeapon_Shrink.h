@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Weapons/ShooterWeapon.h"
-#include "MyShooterWeapon_Shrink.generated.h"
 
+#include "Weapons/ShooterWeapon.h"
+#include "GameFramework/DamageType.h" // for UDamageType::StaticClass()
+#include "MyShooterWeapon_Shrink.generated.h"
 
 USTRUCT()
 struct FShrinkWeaponData
@@ -14,7 +14,7 @@ struct FShrinkWeaponData
 
 	/** projectile class */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AShooterProjectile> ProjectileClass;
+	TSubclassOf<class AMyShooterProjectile_Shrink> ProjectileClass;
 
 	/** life time */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
@@ -39,7 +39,7 @@ struct FShrinkWeaponData
 		ProjectileLife = 10.0f;
 		ShrinkTime = 60; 
 		ExplosionRadius = 300.0f;
-		DamageType = UDamageType::StaticClass();
+		DamageType = NULL;
 	}
 };
 /**
@@ -47,10 +47,10 @@ struct FShrinkWeaponData
  * If during this time another player stomps on him, then
 he dies.
  */
-UCLASS()
+UCLASS(Abstract)
 class SHOOTERGAME_API AMyShooterWeapon_Shrink : public AShooterWeapon
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 	
 	/** apply config on projectile */
 	void ApplyWeaponConfig(FShrinkWeaponData& Data);

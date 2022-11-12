@@ -1,11 +1,24 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ShooterGame.h"
+#include "Weapons/MyShooterProjectile_Shrink.h"
 #include "Weapons/MyShooterWeapon_Shrink.h"
+
+AMyShooterWeapon_Shrink::AMyShooterWeapon_Shrink(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}
+
 
 void AMyShooterWeapon_Shrink::ApplyWeaponConfig(FShrinkWeaponData& Data)
 {
 	Data = ShrinkProjectileConfig;
+
+	
+	if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage is " + (Data.DamageType->GetName()));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Shrink time is " + (Data.ShrinkTime));
+
+		}
 }
 
 void AMyShooterWeapon_Shrink::FireWeapon()
@@ -65,7 +78,7 @@ void AMyShooterWeapon_Shrink::FireWeapon()
 void AMyShooterWeapon_Shrink::ServerFireShrinkProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
 {
 	FTransform SpawnTM(ShootDir.Rotation(), Origin);
-	/*AShooterProjectile* Projectile = Cast<AShooterProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, ShrinkProjectileConfig.ProjectileClass, SpawnTM));
+	AMyShooterProjectile_Shrink* Projectile = Cast<AMyShooterProjectile_Shrink>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, ShrinkProjectileConfig.ProjectileClass, SpawnTM));
 	if (Projectile)
 	{
 		Projectile->SetInstigator(GetInstigator());
@@ -73,10 +86,10 @@ void AMyShooterWeapon_Shrink::ServerFireShrinkProjectile_Implementation(FVector 
 		Projectile->InitVelocity(ShootDir);
 
 		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
-	}*/
+	}
 }
 
-bool AMyShooterWeapon_Shrink::ServerFireShrinkProjectile_Validation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+bool AMyShooterWeapon_Shrink::ServerFireShrinkProjectile_Validate(FVector Origin, FVector_NetQuantizeNormal ShootDir)
 {
 	return true;
 }
