@@ -12,13 +12,6 @@ AMyShooterWeapon_Shrink::AMyShooterWeapon_Shrink(const FObjectInitializer& Objec
 void AMyShooterWeapon_Shrink::ApplyWeaponConfig(FShrinkWeaponData& Data)
 {
 	Data = ShrinkProjectileConfig;
-
-	
-	if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage is " + (Data.DamageType->GetName()));
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Shrink time is " + (Data.ShrinkTime));
-
-		}
 }
 
 void AMyShooterWeapon_Shrink::FireWeapon()

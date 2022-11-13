@@ -5,6 +5,7 @@
 #include "Engine/GameEngine.h"
 #include "Math/UnrealMathUtility.h"
 #include "ECustomMovementMode.h"
+#include "My_ShooterCharacter.h"
 
 UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 {
@@ -16,6 +17,49 @@ UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 	fJetpackResource = 1.0;
 }
 
+
+bool UMy_ShooterCharacterMovement::IsShrinked() 
+{
+	return bIsShrinked;
+}
+
+void UMy_ShooterCharacterMovement::SetShrinkedState(uint8 bShrink, float fShrinkTime )
+{
+	
+	ChangeScale(bShrink);
+
+	if (IsClient()) 
+	{
+		Server_SetShrinkedState(bShrink, fShrinkTime);
+	}
+
+	bIsShrinked = bShrink;
+}
+
+void UMy_ShooterCharacterMovement::ChangeScale(uint8 bShrink) 
+{
+	AMy_ShooterCharacter* Char = Cast<AMy_ShooterCharacter>(UMy_ShooterCharacterMovement::CharacterOwner);
+	if (bShrink) 
+	{
+		UCapsuleComponent* CapsuleComponent = CharacterOwner->GetCapsuleComponent();
+		CapsuleComponent->SetWorldScale3D(FVector((2,2,2)));
+	}
+	else 
+{
+
+	}
+}
+
+void UMy_ShooterCharacterMovement::Server_SetShrinkedState_Implementation(uint8 bShrink, float fShrinkTime = 0) 
+{
+	// change scale
+	ChangeScale(bShrink);
+
+}
+bool UMy_ShooterCharacterMovement::Server_SetShrinkedState_Validate(uint8 bShrink, float fShrinkTime = 0)
+{
+	return true;
+}
 
 
 bool UMy_ShooterCharacterMovement::IsClient()
