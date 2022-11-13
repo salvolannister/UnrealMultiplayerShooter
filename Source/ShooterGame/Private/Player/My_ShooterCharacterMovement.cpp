@@ -17,49 +17,27 @@ UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 	fJetpackResource = 1.0;
 }
 
-
-bool UMy_ShooterCharacterMovement::IsShrinked() 
+void UMy_ShooterCharacterMovement::BeginPlay() 
 {
-	return bIsShrinked;
+	Super::BeginPlay();
+	ShrinkComponent = GetOwner()->FindComponentByClass<UMyActorShrinkComponent>();
 }
 
-void UMy_ShooterCharacterMovement::SetShrinkedState(uint8 bShrink, float fShrinkTime )
-{
-	
-	ChangeScale(bShrink);
 
-	if (IsClient()) 
+
+void UMy_ShooterCharacterMovement::SetShrinkedState(uint8 bShrink, float fShrinkTime)
+{
+
+
+	if (!IsClient())
 	{
-		Server_SetShrinkedState(bShrink, fShrinkTime);
+		ShrinkComponent->Shrink();
 	}
 
-	bIsShrinked = bShrink;
+	fShrinkedTime = fShrinkTime;
 }
 
-void UMy_ShooterCharacterMovement::ChangeScale(uint8 bShrink) 
-{
-	AMy_ShooterCharacter* Char = Cast<AMy_ShooterCharacter>(UMy_ShooterCharacterMovement::CharacterOwner);
-	if (bShrink) 
-	{
-		UCapsuleComponent* CapsuleComponent = CharacterOwner->GetCapsuleComponent();
-		CapsuleComponent->SetWorldScale3D(FVector((2,2,2)));
-	}
-	else 
-{
 
-	}
-}
-
-void UMy_ShooterCharacterMovement::Server_SetShrinkedState_Implementation(uint8 bShrink, float fShrinkTime = 0) 
-{
-	// change scale
-	ChangeScale(bShrink);
-
-}
-bool UMy_ShooterCharacterMovement::Server_SetShrinkedState_Validate(uint8 bShrink, float fShrinkTime = 0)
-{
-	return true;
-}
 
 
 bool UMy_ShooterCharacterMovement::IsClient()
@@ -276,6 +254,7 @@ void UMy_ShooterCharacterMovement::FSavedMove_My::Clear()
 	bSavedWantsToTeleport = false;
 
 	bSavedWantsToUseJetpack = false;
+
 }
 
 // This function returns a byte containing our flags.

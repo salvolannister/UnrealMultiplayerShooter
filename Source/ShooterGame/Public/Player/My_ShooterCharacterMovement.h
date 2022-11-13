@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Player/ShooterCharacterMovement.h"
+#include "MyActorShrinkComponent.h"
 #include "My_ShooterCharacterMovement.generated.h"
 
 /**
@@ -61,14 +62,13 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 
 		// Velocity of the jetpack on Z
 		float SavedJetpackVelocity;
+
 		// The flag that tell us when we want to teleport, the Saved version of bWantsToTeleport
 		uint8 bSavedWantsToTeleport : 1;
 
 		// The flag that tell us when we want to use the jetpack. The saved version of bWantsToUseJetpack
 		uint8 bSavedWantsToUseJetpack : 1;
 
-		// The flag that tell us if the character was shrinked. The saved verison of bIsShrinked
-		uint8 bIsShrinked : 1;
 	};
 
 	// We also need our version of the FNetworkPredictionData_Client_Character class to allocate our own Move.
@@ -97,11 +97,11 @@ public:
 	bool IsCustomMovementMode(uint8 customMove) const;
 	float GetJetpackResource();
 	float GetJetpackFullResource();
-	/* shrink methods*/
-	bool IsShrinked();
+
 	void ChangeScale(uint8 bShrink);
 	void SetShrinkedState(uint8 bShrink, float fShrinkTime = 0);
 private:
+	virtual void BeginPlay() override;
 	// Function to decompress flags from a saved Move
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 
@@ -123,20 +123,17 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
     void Server_SetJetpackVelocity(float JetpackVelocity);
 
-	UFUNCTION(Reliable, Server, WithValidation)
-	void Server_SetShrinkedState(uint8 bShrink, float fShrinkTime = 0);
-
 	// This boolean will trigger the movement in the OnMovementUpdated function native of the standard Movement Component
 	// We use a single bit of a byte to fit this boolean in the FSavedMove_Character template we will override
 	uint8 bWantsToTeleport : 1;
 	uint8 bWantsToUseJetpack : 1;
-	uint8 bIsShrinked : 1;
 	// Function native of the standard Movement Component, this function is triggered at the end of a movement update.
 	void OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	// Teleport
 	// Location to which the character will teleport
 	FVector TeleportLocation;
+
 
 	//Distance you want to be teleported to
 	float TeleportOffset;
@@ -154,6 +151,13 @@ private:
 	float fJetpackFullResource;
 
 	float JetpackFullRechargeSeconds;
+
+	//Remaining time the character will be shrinked
+	float fShrinkedTime;
+
+	float fTotalShrinkTimeSeconds;
+
+	UMyActorShrinkComponent* ShrinkComponent;
 };
 
 

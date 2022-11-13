@@ -152,45 +152,45 @@ void AMy_ShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent cons
 	Super::OnDeath(KillingDamage, DamageEvent, PawnInstigator, DamageCauser);
 }
 
-float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) 
+float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	bool bIsShrinkDamage = (DamageEvent.DamageTypeClass->GetName()).Equals("DmgType_Shrink_C");
-	
+
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Inside take damage ");
 
 	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage type "+ DamageEvent.DamageTypeClass->GetName());
-	
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage type " + DamageEvent.DamageTypeClass->GetName());
 
 
-	if (bIsShrinkDamage )
+
+	if (bIsShrinkDamage)
 	{
 		Damage = 0;
+
+
 		UMy_ShooterCharacterMovement* SCM = GetMyMovementComponent();
-		
-		if (SCM->IsShrinked() == false) 
-		{
-			// Adjust camera position
-		    // check shrink state
-			float fShrinkTime = Damage;
-			SCM->SetShrinkedState(true, fShrinkTime);
-				// set shrink state
-		   
-		   
-		}
-			
-		
-		
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + GetActorScale().ToString());
-		
+
+
+		// Adjust camera position
+		// check shrink state
+		float fShrinkTime = Damage;
+		SCM->SetShrinkedState(true, fShrinkTime);
+		// set shrink state
+
+
 	}
-	
+
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + GetActorScale().ToString());
+
+
+
 	//Call it here so if PC is in God Mode he/she returns
 	float const ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	return ActualDamage;
-	
+
 }
 
 // Function for get our Movement Component 
