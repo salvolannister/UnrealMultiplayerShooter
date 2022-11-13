@@ -28,15 +28,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void Shrink();
+	void Shrink(bool shrink);
 
-	// Called every frame
-	UPROPERTY(ReplicatedUsing = OnRep_IsShrinked)
-	bool bIsShrinked;
 
-	//Replicates mesh changes on clients
-	UFUNCTION()
-	void OnRep_IsShrinked();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

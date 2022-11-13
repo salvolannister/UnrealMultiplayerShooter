@@ -29,10 +29,11 @@ void UMy_ShooterCharacterMovement::SetShrinkedState(uint8 bShrink, float fShrink
 {
 
 
-	if (!IsClient())
-	{
-		ShrinkComponent->Shrink();
-	}
+	//if (!IsClient())
+	//{
+	//	ShrinkComponent->bIsShrinked = (bool) bShrink;
+	//	ShrinkComponent->OnRep_IsShrinked();
+	//}
 
 	fShrinkedTime = fShrinkTime;
 }

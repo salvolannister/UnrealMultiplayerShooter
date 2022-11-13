@@ -11,7 +11,7 @@ UMyActorShrinkComponent::UMyActorShrinkComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	bIsShrinked = false;
+	
 	// ...
 }
 
@@ -34,44 +34,26 @@ void UMyActorShrinkComponent::BeginPlay()
 }
 
 
-void UMyActorShrinkComponent::Shrink() 
+void UMyActorShrinkComponent::Shrink(bool shrink) 
 {
-	if (!bIsShrinked) 
+	if (shrink) 
 	{
 		MyCapsuleComponent->SetWorldScale3D(FVector(0.2, 0.2, 0.2));
 		MyCharacter->SetActorScale3D(FVector(0.2, 0.2, 0.2));
-		bIsShrinked = true;
+		
 	}
 	else 
 	{
 		MyCapsuleComponent->SetWorldScale3D(StartScale);
 		MyCharacter->SetActorScale3D(StartScale);
-		bIsShrinked = false;
 	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
+
 }
 
-//void UMyActorShrinkComponent::Shrink(FVector newScale) 
-//{
-//	MyCapsuleComponent->SetWorldScale3D(newScale);
-//	MyCharacter->SetActorScale3D(newScale);
-//
-//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
-//
-//}
 
 
-void UMyActorShrinkComponent::OnRep_IsShrinked()
-{
-	Shrink();
-}
-
-void UMyActorShrinkComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	// Tells the network when to replicate the variables
-	DOREPLIFETIME(UMyActorShrinkComponent, bIsShrinked);
-}
 
 // Called every frame
 void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

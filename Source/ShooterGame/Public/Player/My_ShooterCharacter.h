@@ -22,12 +22,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	UMy_ShooterCharacterMovement* GetMyMovementComponent() const;
 
-
 	UFUNCTION(unreliable, server, WithValidation)
 	void ServerTakeWeapon(AMyShooterPickup_Gun *weapon);
 
 	UFUNCTION(NetMulticast, reliable)
 	void MulticastRPCDestroyWeapon(AMyShooterPickup_Gun* weapon);
+
+	// Called every frame
+	UPROPERTY(ReplicatedUsing = OnRep_IsShrinked)
+	bool bIsShrinked;
+
+	//Replicates mesh changes on clients
+	UFUNCTION()
+	void OnRep_IsShrinked();
+
+	UFUNCTION(unreliable, server, WithValidation)
+	void ServerShrink(bool shrink);
+
+	UFUNCTION(NetMulticast, reliable)
+	void MulticastRPCShrinkPlayer(bool shrink);
+
 
 private:
 	// Input binding is set in the character in the original project, overriding this method let us expand those bindings

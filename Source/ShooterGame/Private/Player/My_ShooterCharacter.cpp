@@ -4,6 +4,7 @@
 #include "My_ShooterCharacter.h"
 #include "My_ShooterCharacterMovement.h"
 #include "MyShooterPickup_Gun.h"
+#include "MyActorShrinkComponent.h"
 
 // With this constructor Unreal will automatically initialize this Character with my new Movement Component
 AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& ObjectInitializer) :
@@ -21,6 +22,7 @@ AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& Objec
 	WeaponTypeShrinkLauncher = BPClassFinder4.Class;
 
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 }
 
 // Input binding is set in the character in the original project, overriding this method let us expand those bindings
@@ -101,6 +103,19 @@ void AMy_ShooterCharacter::DropWeapon()
 	}
 
 }
+void AMy_ShooterCharacter::OnRep_IsShrinked()
+{
+	FindComponentByClass<UMyActorShrinkComponent>()->Shrink(bIsShrinked);
+}
+
+void AMy_ShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Tells the network when to replicate the variables
+	DOREPLIFETIME(AMy_ShooterCharacter, bIsShrinked);
+}
+
 
 void AMy_ShooterCharacter::ServerTakeWeapon_Implementation(AMyShooterPickup_Gun* gun)
 {
@@ -175,7 +190,11 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		// Adjust camera position
 		// check shrink state
 		float fShrinkTime = Damage;
-		SCM->SetShrinkedState(true, fShrinkTime);
+		
+		if (GetOwner()->GetLocalRole() >= ENetRole::ROLE_Authority)
+		{
+			ServerShrink(true);
+		}
 		// set shrink state
 
 
@@ -192,6 +211,26 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 	return ActualDamage;
 
 }
+
+void AMy_ShooterCharacter::ServerShrink_Implementation(bool shrink) 
+{
+	MulticastRPCShrinkPlayer(true);
+}
+
+bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink) 
+{
+	return true;
+}
+
+
+void AMy_ShooterCharacter::MulticastRPCShrinkPlayer_Implementation(bool shrink)
+{
+
+	bIsShrinked = shrink;
+	OnRep_IsShrinked();
+
+}
+
 
 // Function for get our Movement Component 
 UMy_ShooterCharacterMovement* AMy_ShooterCharacter::GetMyMovementComponent() const
