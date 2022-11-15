@@ -229,6 +229,13 @@ protected:
 	UPROPERTY()
 	FCanvasIcon	JetpackFuelBarBg;
 
+	/** Shrink fuel bar icon. */
+	UPROPERTY()
+	FCanvasIcon ShrinkTimeBar;
+	/** Shrink fuel bar background icon. */
+	UPROPERTY()
+	FCanvasIcon	ShrinkTimeBarBg;
+
 	/** Kills icon. */
 	UPROPERTY()
 	FCanvasIcon KillsIcon;
@@ -286,6 +293,10 @@ protected:
 	UPROPERTY()
     UTexture2D* HUDJetpackTexture;
 	
+	/* Texture for shrinked status in HUD*/
+	UPROPERTY()
+	UTexture2D* HUDShrinkTexture;
+
 	/** Large font - used for ammo display etc. */
 	UPROPERTY()
 	UFont* BigFont;
@@ -349,6 +360,8 @@ protected:
 	/** Draws match timer and player position. */
 	void DrawMatchTimerAndPosition();
 
+	/** Draws player's shrink remaining time on the HUD */
+	void DrawShrinkRemainingTime();
 	/** Draws weapon crosshair. */
 	void DrawCrosshair();
 	

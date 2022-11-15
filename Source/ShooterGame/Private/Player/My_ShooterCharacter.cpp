@@ -4,7 +4,7 @@
 #include "My_ShooterCharacter.h"
 #include "My_ShooterCharacterMovement.h"
 #include "MyShooterPickup_Gun.h"
-#include "MyActorShrinkComponent.h"
+
 
 // With this constructor Unreal will automatically initialize this Character with my new Movement Component
 AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& ObjectInitializer) :
@@ -22,9 +22,16 @@ AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& Objec
 	WeaponTypeShrinkLauncher = BPClassFinder4.Class;
 
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
+	SetReplicates(true);
 }
 
+
+void AMy_ShooterCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ShrinkComponent = FindComponentByClass<UMyActorShrinkComponent>();
+}
 // Input binding is set in the character in the original project, overriding this method let us expand those bindings
 void AMy_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -105,7 +112,10 @@ void AMy_ShooterCharacter::DropWeapon()
 }
 void AMy_ShooterCharacter::OnRep_IsShrinked()
 {
-	FindComponentByClass<UMyActorShrinkComponent>()->Shrink(bIsShrinked);
+	if (ShrinkComponent != NULL)
+	{
+		ShrinkComponent->Shrink(bIsShrinked);
+	}
 }
 
 void AMy_ShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -181,7 +191,7 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 	if (bIsShrinkDamage)
 	{
-		Damage = 0;
+		
 
 
 		UMy_ShooterCharacterMovement* SCM = GetMyMovementComponent();
@@ -190,14 +200,16 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		// Adjust camera position
 		// check shrink state
 		float fShrinkTime = Damage;
-		
+
+		ShrinkComponent->SetTime(fShrinkTime);
 		if (GetOwner()->GetLocalRole() >= ENetRole::ROLE_Authority)
+		//Setting the time won't change anything until the server will update the shrinked state
+		// set shrink state
 		{
 			ServerShrink(true);
 		}
-		// set shrink state
 
-
+		Damage = 0;
 	}
 
 
@@ -212,23 +224,20 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 }
 
-void AMy_ShooterCharacter::ServerShrink_Implementation(bool shrink) 
+void AMy_ShooterCharacter::ServerShrink_Implementation(bool shrink, float time = 0)
 {
-	MulticastRPCShrinkPlayer(true);
-}
-
-bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink) 
-{
-	return true;
-}
-
-
-void AMy_ShooterCharacter::MulticastRPCShrinkPlayer_Implementation(bool shrink)
-{
-
 	bIsShrinked = shrink;
 	OnRep_IsShrinked();
+}
 
+bool AMy_ShooterCharacter::IsShrinked()
+{
+	return bIsShrinked;
+}
+
+bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink, float time = 0)
+{
+	return true;
 }
 
 

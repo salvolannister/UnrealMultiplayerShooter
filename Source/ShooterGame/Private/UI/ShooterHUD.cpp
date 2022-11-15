@@ -40,6 +40,8 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDAssets02TextureOb(TEXT("/Game/UI/HUD/HUDAssets02"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LowHealthOverlayTextureOb(TEXT("/Game/UI/HUD/LowHealthOverlay"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDJetpackTextureOb(TEXT("/Game/UI/HUD/HUDjetpack"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDTShrinkextureOb(TEXT("/Game/UI/HUD/HUDshrink"));
+
 
 
 	// Fonts are not included in dedicated server builds.
@@ -56,8 +58,9 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	HUDMainTexture = HUDMainTextureOb.Object;
 	HUDAssets02Texture = HUDAssets02TextureOb.Object;
 	LowHealthOverlayTexture = LowHealthOverlayTextureOb.Object;
+	
 	HUDJetpackTexture = HUDJetpackTextureOb.Object;
-
+	HUDShrinkTexture = HUDTShrinkextureOb.Object;
 
 
 	HitNotifyIcon[EShooterHudPosition::Left] = UCanvas::MakeIcon(HitNotifyTexture,  158, 831, 585, 392);	
@@ -80,6 +83,9 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	JetpackFuelBar = UCanvas::MakeIcon(HUDJetpackTexture, 67, 212, 372, 50);
 	JetpackFuelBarBg = UCanvas::MakeIcon(HUDJetpackTexture, 67, 162, 372, 50);
+
+	ShrinkTimeBar = UCanvas::MakeIcon(HUDShrinkTexture, 67, 212, 372, 50);
+	ShrinkTimeBarBg = UCanvas::MakeIcon(HUDShrinkTexture, 67, 162, 372, 50);
 
 	HealthIcon = UCanvas::MakeIcon(HUDAssets02Texture, 78, 262, 28, 28);
 	KillsIcon = UCanvas::MakeIcon(HUDMainTexture, 318, 93, 24, 24);
@@ -375,6 +381,35 @@ void AShooterHUD::DrawJetpackFuel()
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem(TileItem);
 }
+
+void AShooterHUD::DrawShrinkRemainingTime()
+{
+	//TODO: try to save CharMov variable globally
+	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(PlayerOwner);
+	AMy_ShooterCharacter* MyCharacter = Cast<AMy_ShooterCharacter>(MyPC->GetCharacter());
+	UMyActorShrinkComponent* ShrinkComponent = Cast<UMyActorShrinkComponent>(MyCharacter->ShrinkComponent);
+	if (!MyCharacter || !MyCharacter->IsShrinked())
+		return;
+
+	const float ShrinkOffsetY = 150.0f;
+	const float ShrinkScaleMul = 0.75f;
+
+	Canvas->SetDrawColor(FColor::White);
+	const float ShrinkTimePosX = (Canvas->ClipX - ShrinkTimeBarBg.UL * ScaleUI * ShrinkScaleMul) / 2;
+	const float ShrinkTimePosY = Canvas->ClipY - (Offset + ShrinkTimeBarBg.VL + ShrinkOffsetY) * ScaleUI * ShrinkScaleMul;
+	Canvas->DrawIcon(ShrinkTimeBarBg, ShrinkTimePosX, ShrinkTimePosY, ScaleUI * ShrinkScaleMul);
+
+	float currentTime =ShrinkComponent->GetResidualTime();
+	float totalTime = ShrinkComponent->GetTotalTime();
+	const float TimeRemaining = FMath::Min(1.0f, currentTime / totalTime);
+
+	FCanvasTileItem TileItem(FVector2D(ShrinkTimePosX, ShrinkTimePosY), ShrinkTimeBar.Texture->Resource,
+		FVector2D(ShrinkTimeBar.UL * TimeRemaining * ScaleUI * ShrinkScaleMul, ShrinkTimeBar.VL * ScaleUI * ShrinkScaleMul), FLinearColor::White);
+	MakeUV(ShrinkTimeBar, TileItem.UV0, TileItem.UV1, ShrinkTimeBar.U, ShrinkTimeBar.V, ShrinkTimeBar.UL * TimeRemaining, ShrinkTimeBar.VL);
+	TileItem.BlendMode = SE_BLEND_Translucent;
+	Canvas->DrawItem(TileItem);
+}
+
 
 void AShooterHUD::DrawNVIDIAReflexTimers()
 {
@@ -684,6 +719,7 @@ void AShooterHUD::DrawHUD()
 			DrawHealth();
 			DrawWeaponHUD();
 			DrawJetpackFuel();
+			DrawShrinkRemainingTime();
 		}
 		else
 		{
