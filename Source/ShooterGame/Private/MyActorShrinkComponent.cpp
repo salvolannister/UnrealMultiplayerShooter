@@ -79,9 +79,6 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 	if (bIsShrinked && fResidualShrinkTime != 0)
 	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Shrink remaining time is " + FString::SanitizeFloat(fResidualShrinkTime));
-		// reduce shrinking time
 		fResidualShrinkTime = FMath::Clamp<float>(fResidualShrinkTime - DeltaTime / fTotalShrinkTime, 0.0f, fResidualShrinkTime);
 	}
 	else if (bIsShrinked && fResidualShrinkTime == 0)
