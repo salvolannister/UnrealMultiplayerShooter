@@ -31,7 +31,35 @@ void AMy_ShooterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ShrinkComponent = FindComponentByClass<UMyActorShrinkComponent>();
+	if (!HasAnyFlags(RF_ClassDefaultObject | RF_ArchetypeObject))
+	{
+		OnActorHit.AddDynamic(this, &AMy_ShooterCharacter::OnHit);
+	}
+
 }
+
+
+void AMy_ShooterCharacter::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	if (ShrinkComponent && bIsShrinked && OtherActor->IsA(AMy_ShooterCharacter::StaticClass()))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " KILLED ");
+	    // (float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
+		AMy_ShooterCharacter* OtherSC = Cast<AMy_ShooterCharacter>(OtherActor);
+		if (OtherSC != NULL) 
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " cast success ");
+			AController* Killer = OtherSC->GetController();
+				
+			FDamageEvent* DamageEvent = new FDamageEvent();
+			// It's already executed only on server thanks to CanDie() function
+			Die(0, *DamageEvent, Killer, OtherActor);
+		}
+
+	}
+}
+
 // Input binding is set in the character in the original project, overriding this method let us expand those bindings
 void AMy_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -191,7 +219,7 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 	if (bIsShrinkDamage)
 	{
-		
+
 
 
 		UMy_ShooterCharacterMovement* SCM = GetMyMovementComponent();
@@ -203,8 +231,8 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 		ShrinkComponent->SetTime(fShrinkTime);
 		if (GetOwner()->GetLocalRole() >= ENetRole::ROLE_Authority)
-		//Setting the time won't change anything until the server will update the shrinked state
-		// set shrink state
+			//Setting the time won't change anything until the server will update the shrinked state
+			// set shrink state
 		{
 			ServerShrink(true);
 		}

@@ -53,6 +53,8 @@ public:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerDropWeapon();
 
+	UFUNCTION()
+	void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 	// Input binding is set in the character in the original project, overriding this method let us expand those bindings
