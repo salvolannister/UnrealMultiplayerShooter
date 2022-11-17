@@ -18,7 +18,7 @@ AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& Objec
 	WeaponTypeRifle = BPClassFinder2.Class;
 	static ConstructorHelpers::FClassFinder<AShooterWeapon> BPClassFinder3(TEXT("/Game/Blueprints/Weapons/WeapLauncher"));
 	WeaponTypeRocketLauncher = BPClassFinder3.Class;
-	static ConstructorHelpers::FClassFinder<AShooterPickup_Ammo> BPClassFinder4(TEXT("/Game/Blueprints/Weapons/WeapShrinker"));
+	static ConstructorHelpers::FClassFinder<AShooterWeapon> BPClassFinder4(TEXT("/Game/Blueprints/Weapons/WeapShrinker"));
 	WeaponTypeShrinkLauncher = BPClassFinder4.Class;
 
 	PrimaryActorTick.bCanEverTick = true;
