@@ -12,6 +12,10 @@ UMyActorShrinkComponent::UMyActorShrinkComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	fTotalShrinkTime = fResidualShrinkTime = 0;
 	bIsShrinked = false;
+	bIsSizeRescaling = false;
+	fTotalSizeRescalingTime = 5;
+	fSizeRescalingTime = 0;
+	FSmallSize = FVector(0.2, 0.2, 0.2);
 	// ...
 }
 
@@ -34,31 +38,22 @@ void UMyActorShrinkComponent::BeginPlay()
 }
 
 
-void UMyActorShrinkComponent::Shrink(bool shrink)
+void UMyActorShrinkComponent::Shrink(bool hasToShrink)
 {
-	bIsShrinked = shrink;
-	if (shrink)
-	{
-		MyCapsuleComponent->SetWorldScale3D(FVector(0.2, 0.2, 0.2));
-		MyCharacter->SetActorScale3D(FVector(0.2, 0.2, 0.2));
-
-	}
-	else
-	{
-		MyCapsuleComponent->SetWorldScale3D(StartScale);
-		MyCharacter->SetActorScale3D(StartScale);
-	}
+	bIsShrinked = hasToShrink;
+	bIsSizeRescaling = true;
+	fSizeRescalingTime = 0;
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
 
 }
 
-float UMyActorShrinkComponent::GetResidualTime()
+float UMyActorShrinkComponent::GetResidualShrinkTime()
 {
 	return fResidualShrinkTime;
 }
 
-float UMyActorShrinkComponent::GetTotalTime()
+float UMyActorShrinkComponent::GetTotalShrinkTime()
 {
 	return fTotalShrinkTime;
 }
@@ -66,7 +61,7 @@ float UMyActorShrinkComponent::GetTotalTime()
 void UMyActorShrinkComponent::SetTime(float fFullTime)
 {
 	fTotalShrinkTime = fResidualShrinkTime = fFullTime;
-	
+
 }
 
 
@@ -77,6 +72,48 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (bIsSizeRescaling && fSizeRescalingTime  < 1)
+	{
+		ScaleCharacter(DeltaTime);
+		return;
+	}
+
+	DecreaseShrinkTimeAndAct(DeltaTime);
+}
+
+void UMyActorShrinkComponent::ScaleCharacter(float DeltaTime)
+{
+	FVector CurrentScale;
+	fSizeRescalingTime = FMath::Clamp<float>(fSizeRescalingTime + DeltaTime / fTotalSizeRescalingTime, 0.0f, 1);
+	if (bIsShrinked)
+	{
+		CurrentScale = FMath::Lerp(StartScale, FSmallSize, fSizeRescalingTime);
+
+	}
+	else
+	{
+		CurrentScale = FMath::Lerp(FSmallSize, StartScale, fSizeRescalingTime);
+
+	}
+
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+		FColor::Red,
+		"while current scale is " + FString::SanitizeFloat(CurrentScale.X));
+
+	MyCapsuleComponent->SetWorldScale3D(CurrentScale);
+	MyCharacter->SetActorScale3D(CurrentScale);
+
+	if (fSizeRescalingTime == 1)
+	{
+		bIsSizeRescaling = false;
+
+	}
+}
+
+
+void UMyActorShrinkComponent::DecreaseShrinkTimeAndAct(float DeltaTime)
+{
 	if (bIsShrinked && fResidualShrinkTime != 0)
 	{
 		fResidualShrinkTime = FMath::Clamp<float>(fResidualShrinkTime - DeltaTime / fTotalShrinkTime, 0.0f, fResidualShrinkTime);

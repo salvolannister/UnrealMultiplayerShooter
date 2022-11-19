@@ -23,6 +23,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Character)
 	UCapsuleComponent* MyCapsuleComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = Character)
+	float fTotalSizeRescalingTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = Character)
+	FVector FSmallSize;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -31,11 +38,17 @@ public:
 	void Shrink(bool shrink);
 	
 	/* Gets the the residual shrinked time*/
-	float GetResidualTime();
+	float GetResidualShrinkTime();
 	/* gets the total time the player will be shrinked*/
-	float GetTotalTime();
+	float GetTotalShrinkTime();
 	/* set the time the player will be shrinked*/
 	void SetTime(float fFullTime);
+
+	/*Is in charge of creating the animation to go from a shrinked state to the normal state and the opposite*/
+	void ScaleCharacter(float DeltaTime);
+
+	/* Change the time remaining for the shrink state and if it's done call the server to rescale the character*/
+	void DecreaseShrinkTimeAndAct(float DeltaTime);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -43,5 +56,7 @@ private:
 	FVector StartScale;
 	float fTotalShrinkTime;
 	float fResidualShrinkTime;
+	float fSizeRescalingTime;
 	bool bIsShrinked;
+	bool bIsSizeRescaling;
 };
