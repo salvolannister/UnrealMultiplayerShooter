@@ -25,12 +25,18 @@ void AMyShooterPickup_Gun::OnRep_MaskMesh()
 	SetWeaponPickupMesh(MaskMesh);
 }
 
+void AMyShooterPickup_Gun::OnRep_Materials() {
+	SetWeaponMaterials(Materials);
+
+}
+
 void AMyShooterPickup_Gun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Tells the network when to replicate the variables
 	DOREPLIFETIME(AMyShooterPickup_Gun, MaskMesh);
+	DOREPLIFETIME(AMyShooterPickup_Gun, Materials);
 }
 
 void AMyShooterPickup_Gun::SetAmmoClips(int32 Clips)
@@ -49,8 +55,17 @@ void AMyShooterPickup_Gun::SetWeaponType(TSubclassOf<AShooterWeapon> Type)
 void AMyShooterPickup_Gun::SetWeaponPickupMesh(USkeletalMesh* WeaponMesh)
 {
 	PickupMesh->SetSkeletalMesh(WeaponMesh, false);
+
 }
 
+void AMyShooterPickup_Gun::SetWeaponMaterials(TArray<UMaterialInterface*> Materials)
+{
+	for (int32 Index = 0, length = Materials.Num(); Index != length; ++Index)
+	{
+		PickupMesh->SetMaterial(Index, Materials[Index]);
+	}
+
+}
 
 void AMyShooterPickup_Gun::GivePickupTo(class AShooterCharacter* Pawn)
 {

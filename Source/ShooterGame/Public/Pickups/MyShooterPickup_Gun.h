@@ -25,9 +25,16 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_MaskMesh)
 	USkeletalMesh* MaskMesh;
 
+	UPROPERTY(ReplicatedUsing = OnRep_Materials)
+	TArray<UMaterialInterface*> Materials;
+
 	//Replicates mesh changes on clients
 	UFUNCTION()
 	void OnRep_MaskMesh();
+
+	//Replicates material changes on clients
+	UFUNCTION()
+	void OnRep_Materials();
 
 	/** Set how many clips this pickup holds */
 	void SetAmmoClips(int32 Clips);
@@ -40,6 +47,9 @@ public:
 
 	/** Set the weapon mesh */
 	void SetWeaponPickupMesh(USkeletalMesh* WeaponMesh);
+
+	/** Set Materials of the weapon to spawn */
+	void SetWeaponMaterials(TArray<UMaterialInterface*> Materials);
 
 private:
 
