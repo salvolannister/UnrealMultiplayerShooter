@@ -399,8 +399,8 @@ void AShooterHUD::DrawShrinkRemainingTime()
 	const float ShrinkTimePosY = Canvas->ClipY - (Offset + ShrinkTimeBarBg.VL + ShrinkOffsetY) * ScaleUI * ShrinkScaleMul;
 	Canvas->DrawIcon(ShrinkTimeBarBg, ShrinkTimePosX, ShrinkTimePosY, ScaleUI * ShrinkScaleMul);
 
-	float currentTime =ShrinkComponent->GetResidualTime();
-	float totalTime = ShrinkComponent->GetTotalTime();
+	float currentTime =ShrinkComponent->GetResidualShrinkTime();
+	float totalTime = ShrinkComponent->GetTotalShrinkTime();
 	const float TimeRemaining = FMath::Min(1.0f, currentTime / totalTime);
 
 	FCanvasTileItem TileItem(FVector2D(ShrinkTimePosX, ShrinkTimePosY), ShrinkTimeBar.Texture->Resource,
