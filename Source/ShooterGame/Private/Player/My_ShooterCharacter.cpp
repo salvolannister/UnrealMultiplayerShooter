@@ -45,13 +45,13 @@ void AMy_ShooterCharacter::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 	if (ShrinkComponent && bIsShrinked && OtherActor->IsA(AMy_ShooterCharacter::StaticClass()))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " KILLED ");
-	    // (float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
+		// (float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
 		AMy_ShooterCharacter* OtherSC = Cast<AMy_ShooterCharacter>(OtherActor);
-		if (OtherSC != NULL) 
+		if (OtherSC != NULL)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " cast success ");
 			AController* Killer = OtherSC->GetController();
-				
+
 			FDamageEvent* DamageEvent = new FDamageEvent();
 			// It's already executed only on server thanks to CanDie() function
 			Die(0, *DamageEvent, Killer, OtherActor);
@@ -125,12 +125,14 @@ void AMy_ShooterCharacter::DropWeapon()
 		TSubclassOf<class AShooterWeapon> WeapType;
 		switch (EquippedWeapon->GetAmmoType())
 		{
-		case AShooterWeapon::EAmmoType::EBullet:
-			WeapType = WeaponTypeRifle;
-			break;
-		case AShooterWeapon::EAmmoType::ERocket:
-			WeapType = WeaponTypeRocketLauncher;
-			break;
+			case AShooterWeapon::EAmmoType::EBullet:
+				WeapType = WeaponTypeRifle;
+				break;
+			case AShooterWeapon::EAmmoType::ERocket:
+				WeapType = WeaponTypeRocketLauncher;
+				break;
+			case AShooterWeapon::EAmmoType::EShrinkRocket:
+				WeapType = WeaponTypeShrinkLauncher;
 		}
 		DroppedGun->SetWeaponType(WeapType);
 
