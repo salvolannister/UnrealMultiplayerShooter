@@ -38,11 +38,31 @@ void UMyActorShrinkComponent::BeginPlay()
 }
 
 
-void UMyActorShrinkComponent::Shrink(bool hasToShrink)
+void UMyActorShrinkComponent::Shrink(bool hasToShrink, bool hasToSkipShrinkInterpolation)
 {
 	bIsShrinked = hasToShrink;
-	bIsSizeRescaling = true;
-	fSizeRescalingTime = 0;
+	if (!hasToSkipShrinkInterpolation)
+	{
+		bIsSizeRescaling = true;
+		fSizeRescalingTime = 0;
+
+	}
+	else 
+	{
+		FVector newScale;
+		if (bIsShrinked) 
+		{
+			newScale = FSmallSize;
+		}
+		else 
+		{
+			newScale = StartScale;
+		}
+
+		MyCapsuleComponent->SetWorldScale3D(newScale);
+		MyCharacter->SetActorScale3D(newScale);
+
+	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
 
@@ -72,16 +92,16 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bIsSizeRescaling && fSizeRescalingTime  < 1)
+	if (bIsSizeRescaling && fSizeRescalingTime < 1)
 	{
-		ScaleCharacter(DeltaTime);
+		ScaleCharacterWithInterpolation(DeltaTime);
 		return;
 	}
 
 	DecreaseShrinkTimeAndAct(DeltaTime);
 }
 
-void UMyActorShrinkComponent::ScaleCharacter(float DeltaTime)
+void UMyActorShrinkComponent::ScaleCharacterWithInterpolation(float DeltaTime)
 {
 	FVector CurrentScale;
 	fSizeRescalingTime = FMath::Clamp<float>(fSizeRescalingTime + DeltaTime / fTotalSizeRescalingTime, 0.0f, 1);
@@ -107,7 +127,6 @@ void UMyActorShrinkComponent::ScaleCharacter(float DeltaTime)
 	if (fSizeRescalingTime == 1)
 	{
 		bIsSizeRescaling = false;
-
 	}
 }
 

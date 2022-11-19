@@ -35,7 +35,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void Shrink(bool shrink);
+	void Shrink(bool shrink, bool hasToSkipShrinkInterpolation);
 	
 	/* Gets the the residual shrinked time*/
 	float GetResidualShrinkTime();
@@ -45,7 +45,7 @@ public:
 	void SetTime(float fFullTime);
 
 	/*Is in charge of creating the animation to go from a shrinked state to the normal state and the opposite*/
-	void ScaleCharacter(float DeltaTime);
+	void ScaleCharacterWithInterpolation(float DeltaTime);
 
 	/* Change the time remaining for the shrink state and if it's done call the server to rescale the character*/
 	void DecreaseShrinkTimeAndAct(float DeltaTime);
