@@ -4,7 +4,6 @@
 #include "ShooterGame.h"
 #include "MyActorShrinkComponent.h"
 
-// Sets default values for this component's properties
 UMyActorShrinkComponent::UMyActorShrinkComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
@@ -21,17 +20,12 @@ UMyActorShrinkComponent::UMyActorShrinkComponent()
 }
 
 
-// Called when the game starts
 void UMyActorShrinkComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	// scale the character 
 	MyCharacter = Cast<AMy_ShooterCharacter>(GetOwner());
-	//UCapsuleComponent* MyCapsuleComponent = MyCharacter->GetCapsuleComponent();
-	StartScale = MyCharacter->GetActorScale3D();//MyCapsuleComponent->GetRelativeScale3D();
-
+	StartScale = MyCharacter->GetActorScale3D();
 
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + StartScale.ToString());
@@ -78,9 +72,6 @@ void UMyActorShrinkComponent::SetTime(float fFullTime)
 }
 
 
-
-
-// Called every frame
 void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
