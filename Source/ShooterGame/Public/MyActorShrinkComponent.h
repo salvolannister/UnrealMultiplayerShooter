@@ -54,6 +54,8 @@ public:
 
 private: 
 	FVector StartScale;
+	float fStartBaseHeight;
+	float fShrinkedBaseHeight;
 	float fTotalShrinkTime;
 	float fResidualShrinkTime;
 	float fSizeRescalingTime;

@@ -16,6 +16,7 @@ UMyActorShrinkComponent::UMyActorShrinkComponent()
 	fTotalSizeRescalingTime = 5;
 	fSizeRescalingTime = 0;
 	FSmallSize = FVector(0.2, 0.2, 0.2);
+	
 	// ...
 }
 
@@ -34,7 +35,8 @@ void UMyActorShrinkComponent::BeginPlay()
 
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + StartScale.ToString());
-
+	fStartBaseHeight = MyCharacter->BaseEyeHeight;
+	fShrinkedBaseHeight = fStartBaseHeight * 0.2f;
 }
 
 
@@ -45,7 +47,7 @@ void UMyActorShrinkComponent::Shrink(bool hasToShrink, bool hasToSkipShrinkInter
 	{
 		bIsSizeRescaling = true;
 		fSizeRescalingTime = 0;
-
+		
 	}
 	else 
 	{
@@ -104,15 +106,17 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 void UMyActorShrinkComponent::ScaleCharacterWithInterpolation(float DeltaTime)
 {
 	FVector CurrentScale;
+	float TargetBaseHeight;
 	fSizeRescalingTime = FMath::Clamp<float>(fSizeRescalingTime + DeltaTime / fTotalSizeRescalingTime, 0.0f, 1);
 	if (bIsShrinked)
 	{
 		CurrentScale = FMath::Lerp(StartScale, FSmallSize, fSizeRescalingTime);
-
+		TargetBaseHeight = FMath::Lerp(fStartBaseHeight, fShrinkedBaseHeight, fSizeRescalingTime);
 	}
 	else
 	{
 		CurrentScale = FMath::Lerp(FSmallSize, StartScale, fSizeRescalingTime);
+		TargetBaseHeight = FMath::Lerp( fShrinkedBaseHeight, fStartBaseHeight, fSizeRescalingTime);
 
 	}
 
@@ -123,7 +127,7 @@ void UMyActorShrinkComponent::ScaleCharacterWithInterpolation(float DeltaTime)
 
 	MyCapsuleComponent->SetWorldScale3D(CurrentScale);
 	MyCharacter->SetActorScale3D(CurrentScale);
-
+	MyCharacter->BaseEyeHeight = TargetBaseHeight;
 	if (fSizeRescalingTime == 1)
 	{
 		bIsSizeRescaling = false;
