@@ -51,19 +51,10 @@ void UMyActorShrinkComponent::Shrink(bool hasToShrink, bool hasToSkipShrinkInter
 	}
 	else 
 	{
-		FVector newScale;
-		if (bIsShrinked) 
-		{
-			newScale = FSmallSize;
-		}
-		else 
-		{
-			newScale = StartScale;
-		}
-
-		MyCapsuleComponent->SetWorldScale3D(newScale);
-		MyCharacter->SetActorScale3D(newScale);
-
+		// setting the scale with lerping parameter equals to one is like 
+		// skipping the interpolation
+		float LerpingParameter = 1;
+		SetScale(LerpingParameter);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
@@ -105,33 +96,40 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UMyActorShrinkComponent::ScaleCharacterWithInterpolation(float DeltaTime)
 {
-	FVector CurrentScale;
-	float TargetBaseHeight;
+	
 	fSizeRescalingTime = FMath::Clamp<float>(fSizeRescalingTime + DeltaTime / fTotalSizeRescalingTime, 0.0f, 1);
-	if (bIsShrinked)
-	{
-		CurrentScale = FMath::Lerp(StartScale, FSmallSize, fSizeRescalingTime);
-		TargetBaseHeight = FMath::Lerp(fStartBaseHeight, fShrinkedBaseHeight, fSizeRescalingTime);
-	}
-	else
-	{
-		CurrentScale = FMath::Lerp(FSmallSize, StartScale, fSizeRescalingTime);
-		TargetBaseHeight = FMath::Lerp( fShrinkedBaseHeight, fStartBaseHeight, fSizeRescalingTime);
+	
+	SetScale(fSizeRescalingTime);
 
-	}
-
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f,
-		FColor::Red,
-		"while current scale is " + FString::SanitizeFloat(CurrentScale.X));
-
-	MyCapsuleComponent->SetWorldScale3D(CurrentScale);
-	MyCharacter->SetActorScale3D(CurrentScale);
-	MyCharacter->BaseEyeHeight = TargetBaseHeight;
 	if (fSizeRescalingTime == 1)
 	{
 		bIsSizeRescaling = false;
 	}
+}
+
+/// <summary>
+/// Sets the scale of the character looking at bIsShrinked value.
+/// </summary>
+/// <param name="fLerpingParameter">Set to 1 to change the scale istantly</param>
+void UMyActorShrinkComponent::SetScale(float fLerpingParameter)
+{
+	FVector CurrentScale;
+	float TargetBaseHeight;
+	if (bIsShrinked)
+	{
+		CurrentScale = FMath::Lerp(StartScale, FSmallSize, fLerpingParameter);
+		TargetBaseHeight = FMath::Lerp(fStartBaseHeight, fShrinkedBaseHeight, fLerpingParameter);
+	}
+	else
+	{
+		CurrentScale = FMath::Lerp(FSmallSize, StartScale, fLerpingParameter);
+		TargetBaseHeight = FMath::Lerp(fShrinkedBaseHeight, fStartBaseHeight, fLerpingParameter);
+
+	}
+
+	MyCapsuleComponent->SetWorldScale3D(CurrentScale);
+	MyCharacter->SetActorScale3D(CurrentScale);
+	MyCharacter->BaseEyeHeight = TargetBaseHeight;
 }
 
 
