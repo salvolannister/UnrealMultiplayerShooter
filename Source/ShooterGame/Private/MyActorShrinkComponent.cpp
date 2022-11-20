@@ -27,8 +27,6 @@ void UMyActorShrinkComponent::BeginPlay()
 	MyCharacter = Cast<AMy_ShooterCharacter>(GetOwner());
 	StartScale = MyCharacter->GetActorScale3D();
 
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + StartScale.ToString());
 	fStartBaseHeight = MyCharacter->BaseEyeHeight;
 	fShrinkedBaseHeight = fStartBaseHeight * 0.2f;
 }

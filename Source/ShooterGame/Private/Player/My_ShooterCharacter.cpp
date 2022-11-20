@@ -232,14 +232,6 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 {
 	bool bIsShrinkDamage = (DamageEvent.DamageTypeClass->GetName()).Equals("DmgType_Shrink_C");
 
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Inside take damage ");
-
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Damage type " + DamageEvent.DamageTypeClass->GetName());
-
-
-
 	if (bIsShrinkDamage)
 	{
 
@@ -267,12 +259,6 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 		Damage = 0;
 	}
-
-
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor scale is " + GetActorScale().ToString());
-
-
 
 	//Call it here so if PC is in God Mode he/she returns
 	float const ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
