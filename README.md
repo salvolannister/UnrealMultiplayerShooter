@@ -10,17 +10,17 @@ When the player dies it will drop the weapon that could be collected by other pl
 is the same the player was using with its current loaded and not loaded clips.
 
 #TODO
-- Shrink gun: when hitting an opponent with this weapon it gets tiny (about 20cm tall)
-for a specific amount of time. If during this time another player stomps on him, then
-he dies. The shrinking, and eventually subsequent rescaling, must be interpolated.
-The amount of remaining time shrinked must appear properly on the HUD of the
-affected player. Proper graphic effect is a plus.
+- Aggiungere overlay dello shrinking
+- Provare a settare bIsActive to false prima di prendere l'arma
 
 - [IMPROVEMENT] Save mymovement component in a variable inside My_ShooterCharacter so 
 that I won't need to cast it every time I ask for it
 https://youtu.be/Of8SGBa3WvU?t=340
 - [IMPROVEMENT] Implement client prediction for dropped gun
 
+#OF NOTICE
+La replicazione della destroy del pick up
+potrebbe non avvenire perché la RPC viene chiamata da una classe che non deriva dal player character
 
 #USEFULL MATERIAL
 video implementing jetpack: https://www.youtube.com/watch?v=DoZyH86n_gs
