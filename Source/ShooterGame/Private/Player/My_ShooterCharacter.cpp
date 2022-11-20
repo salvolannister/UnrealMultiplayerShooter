@@ -232,10 +232,7 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 	if (bIsShrinkDamage)
 	{
 
-
-
 		UMy_ShooterCharacterMovement* SCM = GetMyMovementComponent();
-
 
 		// Adjust camera position
 		// check shrink state
