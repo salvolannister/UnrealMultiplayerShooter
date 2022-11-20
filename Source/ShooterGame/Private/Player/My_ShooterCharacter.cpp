@@ -44,14 +44,11 @@ void AMy_ShooterCharacter::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 
 	if (ShrinkComponent && bIsShrinked && OtherActor->IsA(AMy_ShooterCharacter::StaticClass()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " KILLED ");
-		// (float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser)
+		
 		AMy_ShooterCharacter* OtherSC = Cast<AMy_ShooterCharacter>(OtherActor);
 		if (OtherSC != NULL)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, " cast success ");
 			AController* Killer = OtherSC->GetController();
-
 			FDamageEvent* DamageEvent = new FDamageEvent();
 
 			if (HasAuthority())
