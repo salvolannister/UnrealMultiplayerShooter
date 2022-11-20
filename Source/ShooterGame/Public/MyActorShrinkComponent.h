@@ -34,18 +34,18 @@ protected:
 
 public:	
 
-	void Shrink(bool shrink, bool hasToSkipShrinkInterpolation);	
+	void SetValueToStartScaling(bool HasToShrink, bool HasToSkipShrinkInterpolation);	
 	/* Gets the the residual shrinked time*/
 	float GetResidualShrinkTime();
 	/* gets the total time the player will be shrinked*/
 	float GetTotalShrinkTime();
 	/* sets the time the player will be shrinked*/
-	void SetTime(float fFullTime);
+	void SetTotalShrinkTime(float fFullTime);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private: 
-	FVector StartScale;
+	FVector FStartScale;
 	float fStartBaseHeight;
 	float fShrinkedBaseHeight;
 	float fTotalShrinkTime;
@@ -54,10 +54,8 @@ private:
 	bool bIsShrinked;
 	bool bIsSizeRescaling;
 
-	void SetScale(float fLerpingParameter);
-
-	/*Is in charge of creating the animation to go from a shrinked state to the normal state and the opposite*/
-	void ScaleCharacterWithInterpolation(float DeltaTime);
+	/* Checks if the character is shrinked and then based on the lerping parameters scales the character to a value between the current scale and the target one */
+	void SetCharacterScaleWithLerping(float fLerpingParameter);
 
 	/* Change the time remaining for the shrink state and if it's done call the server to rescale the character*/
 	void DecreaseShrinkTimeAndAct(float DeltaTime);
