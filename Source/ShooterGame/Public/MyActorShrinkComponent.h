@@ -34,7 +34,7 @@ protected:
 
 public:	
 
-	void SetValueToStartScaling(bool HasToShrink, bool HasToSkipShrinkInterpolation);	
+	void ShrinkCharacter(bool HasToShrink, bool HasToSkipShrinkInterpolation);
 	/* Gets the the residual shrinked time*/
 	float GetResidualShrinkTime();
 	/* gets the total time the player will be shrinked*/

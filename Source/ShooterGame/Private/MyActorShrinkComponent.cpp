@@ -32,7 +32,7 @@ void UMyActorShrinkComponent::BeginPlay()
 }
 
 
-void UMyActorShrinkComponent::SetValueToStartScaling(bool HasToShrink, bool HasToSkipShrinkInterpolation)
+void UMyActorShrinkComponent::ShrinkCharacter(bool HasToShrink, bool HasToSkipShrinkInterpolation)
 {
 	bIsShrinked = HasToShrink;
 	if (!HasToSkipShrinkInterpolation)

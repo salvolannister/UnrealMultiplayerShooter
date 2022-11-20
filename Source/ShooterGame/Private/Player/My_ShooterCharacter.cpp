@@ -154,7 +154,7 @@ void AMy_ShooterCharacter::OnRep_IsShrinked()
 {
 	if (ShrinkComponent != NULL)
 	{
-		ShrinkComponent->Shrink(bIsShrinked, bSkipShrinkInterpolation);
+		ShrinkComponent->ShrinkCharacter(bIsShrinked, bSkipShrinkInterpolation);
 	}
 }
 
@@ -238,7 +238,7 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		// check shrink state
 		float fShrinkTime = Damage;
 
-		ShrinkComponent->SetTime(fShrinkTime);
+		ShrinkComponent->SetTotalShrinkTime(fShrinkTime);
 		if (GetOwner()->GetLocalRole() >= ENetRole::ROLE_Authority)
 			//Setting the time won't change anything until the server will update the shrinked state
 			// set shrink state
