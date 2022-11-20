@@ -50,10 +50,6 @@ bool UMy_ShooterCharacterMovement::IsClient()
 void UMy_ShooterCharacterMovement::UseJetpack()
 {
 
-	// Calcolate the Location to teleport to
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to use jetpack");
-
 	// If we are the client and we have control we send the location to the server 
 	if (IsClient())
 		Server_SetJetpackVelocity(Velocity.Z);
@@ -64,10 +60,6 @@ void UMy_ShooterCharacterMovement::UseJetpack()
 
 void UMy_ShooterCharacterMovement::StopJetpacking()
 {
-
-	// Calcolate the Location to teleport to
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Wants to stop using jetpack");
 
 	// If we are the client and we have control we send the location to the server 
 	if (IsClient())
@@ -166,13 +158,6 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 	Velocity.Z += desiredTotalJetpackAccel * deltaTime;
 
 	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, fJetpackFullResource);
-#pragma region print Velocity
-	if (GetPawnOwner()->IsLocallyControlled())
-	{
-		UKismetSystemLibrary::PrintString(GetWorld(), FString("Speed: ") + FString::SanitizeFloat(Velocity.Size()), true, false, FLinearColor::Red, 0.0);
-		UKismetSystemLibrary::PrintString(GetWorld(), FString("Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
-	}
-#pragma endregion
 
 	PhysFalling(deltaTime, Iterations);
 }
