@@ -99,7 +99,6 @@ public:
 	float GetJetpackFullResource();
 
 	void ChangeScale(uint8 bShrink);
-	void SetShrinkedState(uint8 bShrink, float fShrinkTime = 0);
 private:
 	virtual void BeginPlay() override;
 	// Function to decompress flags from a saved Move
@@ -152,12 +151,6 @@ private:
 
 	float JetpackFullRechargeSeconds;
 
-	//Remaining time the character will be shrinked
-	float fShrinkedTime;
-
-	float fTotalShrinkTimeSeconds;
-
-	UMyActorShrinkComponent* ShrinkComponent;
 };
 
 

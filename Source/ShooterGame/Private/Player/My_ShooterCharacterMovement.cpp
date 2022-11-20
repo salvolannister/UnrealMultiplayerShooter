@@ -20,23 +20,11 @@ UMy_ShooterCharacterMovement::UMy_ShooterCharacterMovement()
 void UMy_ShooterCharacterMovement::BeginPlay() 
 {
 	Super::BeginPlay();
-	ShrinkComponent = GetOwner()->FindComponentByClass<UMyActorShrinkComponent>();
 }
 
 
 
-void UMy_ShooterCharacterMovement::SetShrinkedState(uint8 bShrink, float fShrinkTime)
-{
 
-
-	//if (!IsClient())
-	//{
-	//	ShrinkComponent->bIsShrinked = (bool) bShrink;
-	//	ShrinkComponent->OnRep_IsShrinked();
-	//}
-
-	fShrinkedTime = fShrinkTime;
-}
 
 
 
