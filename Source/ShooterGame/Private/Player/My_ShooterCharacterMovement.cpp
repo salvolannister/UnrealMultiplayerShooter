@@ -294,9 +294,6 @@ void UMy_ShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations)
 		return;
 	}
 
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Phys Custom");
-
 	switch (CustomMovementMode)
 	{
 		case ECustomMovementMode::CMOVE_JETPACKING:
