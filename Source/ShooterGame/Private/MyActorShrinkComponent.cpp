@@ -32,10 +32,10 @@ void UMyActorShrinkComponent::BeginPlay()
 }
 
 
-void UMyActorShrinkComponent::SetValueToStartScaling(bool hasToShrink, bool hasToSkipShrinkInterpolation)
+void UMyActorShrinkComponent::SetValueToStartScaling(bool HasToShrink, bool HasToSkipShrinkInterpolation)
 {
-	bIsShrinked = hasToShrink;
-	if (!hasToSkipShrinkInterpolation)
+	bIsShrinked = HasToShrink;
+	if (!HasToSkipShrinkInterpolation)
 	{
 		bIsSizeRescaling = true;
 		fSizeRescalingTime = 0;
@@ -60,9 +60,9 @@ float UMyActorShrinkComponent::GetTotalShrinkTime()
 	return fTotalShrinkTime;
 }
 
-void UMyActorShrinkComponent::SetTotalShrinkTime(float fFullTime)
+void UMyActorShrinkComponent::SetTotalShrinkTime(float FullTime)
 {
-	fTotalShrinkTime = fResidualShrinkTime = fFullTime;
+	fTotalShrinkTime = fResidualShrinkTime = FullTime;
 
 }
 
@@ -91,19 +91,19 @@ void UMyActorShrinkComponent::TickComponent(float DeltaTime, ELevelTick TickType
 /// Sets the scale of the character looking at bIsShrinked value.
 /// </summary>
 /// <param name="fLerpingParameter">Set to 1 to change the scale istantly</param>
-void UMyActorShrinkComponent::SetCharacterScaleWithLerping(float fLerpingParameter)
+void UMyActorShrinkComponent::SetCharacterScaleWithLerping(float LerpingParameter)
 {
 	FVector CurrentScale;
 	float TargetBaseHeight;
 	if (bIsShrinked)
 	{
-		CurrentScale = FMath::Lerp(FStartScale, FSmallSize, fLerpingParameter);
-		TargetBaseHeight = FMath::Lerp(fStartBaseHeight, fShrinkedBaseHeight, fLerpingParameter);
+		CurrentScale = FMath::Lerp(FStartScale, FSmallSize, LerpingParameter);
+		TargetBaseHeight = FMath::Lerp(fStartBaseHeight, fShrinkedBaseHeight, LerpingParameter);
 	}
 	else
 	{
-		CurrentScale = FMath::Lerp(FSmallSize, FStartScale, fLerpingParameter);
-		TargetBaseHeight = FMath::Lerp(fShrinkedBaseHeight, fStartBaseHeight, fLerpingParameter);
+		CurrentScale = FMath::Lerp(FSmallSize, FStartScale, LerpingParameter);
+		TargetBaseHeight = FMath::Lerp(fShrinkedBaseHeight, fStartBaseHeight, LerpingParameter);
 
 	}
 
