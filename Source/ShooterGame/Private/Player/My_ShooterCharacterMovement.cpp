@@ -278,10 +278,7 @@ void UMy_ShooterCharacterMovement::TickComponent(float DeltaTime, ELevelTick Tic
 	{
 		fJetpackResource = FMath::Clamp<float>(fJetpackResource + (DeltaTime / JetpackFullRechargeSeconds), 0, 1);
 	}
-	else
-	{
-		UKismetSystemLibrary::PrintString(GetWorld(), FString("Jetpack Resource: ") + FString::SanitizeFloat(fJetpackResource), true, false, FLinearColor::Red, 0.0);
-	}
+	
 
 
 }
