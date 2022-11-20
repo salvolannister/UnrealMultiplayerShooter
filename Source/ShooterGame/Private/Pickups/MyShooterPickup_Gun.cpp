@@ -141,7 +141,7 @@ void AMyShooterPickup_Gun::OnPickedUp()
 		{
 			Destroy();
 		}
-		else
+		else if(MSC->IsLocallyControlled())
 		{
 			MSC->ServerTakeWeapon(this);
 		}
