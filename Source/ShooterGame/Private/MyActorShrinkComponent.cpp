@@ -29,8 +29,8 @@ void UMyActorShrinkComponent::BeginPlay()
 	// ...
 	// scale the character 
 	MyCharacter = Cast<AMy_ShooterCharacter>(GetOwner());
-	MyCapsuleComponent = MyCharacter->GetCapsuleComponent();
-	StartScale = MyCharacter->GetCapsuleComponent()->GetRelativeScale3D();
+	//UCapsuleComponent* MyCapsuleComponent = MyCharacter->GetCapsuleComponent();
+	StartScale = MyCharacter->GetActorScale3D();//MyCapsuleComponent->GetRelativeScale3D();
 
 
 	if (GEngine)
@@ -127,7 +127,6 @@ void UMyActorShrinkComponent::SetScale(float fLerpingParameter)
 
 	}
 
-	MyCapsuleComponent->SetWorldScale3D(CurrentScale);
 	MyCharacter->SetActorScale3D(CurrentScale);
 	MyCharacter->BaseEyeHeight = TargetBaseHeight;
 }

@@ -22,9 +22,6 @@ public:
 	AMy_ShooterCharacter* MyCharacter;
 
 	UPROPERTY(EditDefaultsOnly, Category = Character)
-	UCapsuleComponent* MyCapsuleComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category = Character)
 	float fTotalSizeRescalingTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = Character)
@@ -41,7 +38,7 @@ public:
 	float GetResidualShrinkTime();
 	/* gets the total time the player will be shrinked*/
 	float GetTotalShrinkTime();
-	/* set the time the player will be shrinked*/
+	/* sets the time the player will be shrinked*/
 	void SetTime(float fFullTime);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
