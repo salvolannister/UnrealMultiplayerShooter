@@ -27,6 +27,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Character)
 	FVector FSmallSize;
 
+	float const fSKIP_INTERPOLATION = 1;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

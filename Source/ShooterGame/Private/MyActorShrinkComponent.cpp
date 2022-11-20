@@ -45,11 +45,8 @@ void UMyActorShrinkComponent::Shrink(bool hasToShrink, bool hasToSkipShrinkInter
 	{
 		// setting the scale with lerping parameter equals to one is like 
 		// skipping the interpolation
-		float LerpingParameter = 1;
-		SetScale(LerpingParameter);
+		SetScale(fSKIP_INTERPOLATION);
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Actor" + MyCharacter->GetName() + "scale is " + MyCharacter->GetActorScale3D().ToString());
 
 }
 
