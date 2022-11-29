@@ -38,6 +38,9 @@ public:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_IsShrinked)
 	bool bSkipShrinkInterpolation = false;
+
+	UPROPERTY(ReplicatedUsing = OnRep_IsShrinked)
+	float fShrinkTime;
 	/* Gets if the player is shrinked*/
 	UFUNCTION()
 	bool IsShrinked();
@@ -47,7 +50,7 @@ public:
 	void OnRep_IsShrinked();
 
 	UFUNCTION(unreliable, server, WithValidation)
-	void ServerShrink(bool shrink, bool skipInterpolation = false);
+	void ServerShrink(bool shrink,float shrinkTime = 0, bool skipInterpolation = false);
 
 	/** [server RPC] Drops the currently equipped gun as pickup */
 	UFUNCTION(reliable, server, WithValidation)
@@ -70,8 +73,8 @@ private:
 	// Function called when the player picks up a weapon
 	void PickWeapon();
 
-	//Function that sets that update the variable related to the shrink effect on the character
-	void Shrink(bool shrink, bool skipInterpolation = false);
+	//Function that updates the variables related to the shrink effect on the character
+	void Shrink(bool shrink,float fShrinkTime, bool skipInterpolation = false);
 
 	TSubclassOf<class AShooterPickup_Ammo> ShooterPickupDroppedGunClass;
 

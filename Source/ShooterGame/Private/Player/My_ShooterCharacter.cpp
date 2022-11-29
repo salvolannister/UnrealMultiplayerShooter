@@ -22,6 +22,7 @@ AMy_ShooterCharacter::AMy_ShooterCharacter(const class FObjectInitializer& Objec
 	WeaponTypeShrinkLauncher = BPClassFinder4.Class;
 
 	PrimaryActorTick.bCanEverTick = true;
+	fShrinkTime = 0;
 	SetReplicates(true);
 }
 
@@ -44,7 +45,7 @@ void AMy_ShooterCharacter::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 
 	if (ShrinkComponent && bIsShrinked && OtherActor->IsA(AMy_ShooterCharacter::StaticClass()))
 	{
-		
+
 		AMy_ShooterCharacter* OtherSC = Cast<AMy_ShooterCharacter>(OtherActor);
 		if (OtherSC != NULL)
 		{
@@ -53,11 +54,11 @@ void AMy_ShooterCharacter::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 
 			if (HasAuthority())
 			{
-				Shrink(false, true);
+				Shrink(false, 0, true);
 			}
 			else if (IsLocallyControlled() && GetLocalRole() == ROLE_AutonomousProxy)
 			{
-				ServerShrink(false, true);
+				ServerShrink(false, 0, true);
 			}
 
 			// It's already executed only on server thanks to CanDie() function
@@ -154,6 +155,7 @@ void AMy_ShooterCharacter::OnRep_IsShrinked()
 {
 	if (ShrinkComponent != NULL)
 	{
+		ShrinkComponent->SetTotalShrinkTime(fShrinkTime);
 		ShrinkComponent->ShrinkCharacter(bIsShrinked, bSkipShrinkInterpolation);
 	}
 }
@@ -165,6 +167,7 @@ void AMy_ShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 	// Tells the network when to replicate the variables
 	DOREPLIFETIME(AMy_ShooterCharacter, bIsShrinked);
 	DOREPLIFETIME(AMy_ShooterCharacter, bSkipShrinkInterpolation);
+	DOREPLIFETIME(AMy_ShooterCharacter, fShrinkTime);
 }
 
 
@@ -238,17 +241,16 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		// check shrink state
 		float fShrinkTime = Damage;
 
-		ShrinkComponent->SetTotalShrinkTime(fShrinkTime);
 		if (GetOwner()->GetLocalRole() >= ENetRole::ROLE_Authority)
 			//Setting the time won't change anything until the server will update the shrinked state
 			// set shrink state
 		{
-			Shrink(true);
-			
+			Shrink(true, fShrinkTime);
+
 		}
 		else if (IsLocallyControlled())
 		{
-			ServerShrink(true);
+			ServerShrink(true, fShrinkTime);
 		}
 
 		Damage = 0;
@@ -260,15 +262,16 @@ float AMy_ShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 }
 
-void AMy_ShooterCharacter::ServerShrink_Implementation(bool shrink, bool skipInterpolation = false)
+void AMy_ShooterCharacter::ServerShrink_Implementation(bool shrink, float fShrinkTime = 0, bool skipInterpolation = false)
 {
-	Shrink(shrink, skipInterpolation);
+	Shrink(shrink, fShrinkTime, skipInterpolation);
 }
 
-void AMy_ShooterCharacter::Shrink(bool shrink, bool skipInterpolation)
+void AMy_ShooterCharacter::Shrink(bool shrink, float fShrinkTime, bool skipInterpolation)
 {
 	bIsShrinked = shrink;
 	bSkipShrinkInterpolation = skipInterpolation;
+	this->fShrinkTime = fShrinkTime;
 	OnRep_IsShrinked();
 }
 
@@ -277,7 +280,7 @@ bool AMy_ShooterCharacter::IsShrinked()
 	return bIsShrinked;
 }
 
-bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink, bool skipInterpolation = false)
+bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink, float fShrinkTime, bool skipInterpolation = false)
 {
 	return true;
 }
