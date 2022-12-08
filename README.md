@@ -14,14 +14,18 @@ When a player is hit by a rocket of the shrink weapon. They shrinks and if someo
 #TODO
 
 - Aggiungere overlay dello shrinking
-- Provare a settare bIsActive to false prima di prendere l'arma
+- L'arma sembra non autodistruggersi se nessuno la prende
+- Non mandare la teleport location, ma calcolarla sia in loco che in remoto (questa strategia è preferibile a causa del lag)
+- Settare la fisica a falling quando si usa il jetpack
+- Comportamento strano quando si preme il tasto del jetpack appena si sta atterrando
+- Fare il teleport considerando le collisioni e usando un raycast per trovare i muri dinnanzi a se. Sistemare il comportamento strano che
+si ha quando ci si teleporta nelle scale
 - [IMPROVEMENT] Save mymovement component in a variable inside My_ShooterCharacter so 
 that I won't need to cast it every time I ask for it
 https://youtu.be/Of8SGBa3WvU?t=340
 - [IMPROVEMENT] Implement client prediction for dropped gun
-- [BUG] Se è il server ad essere colpito, il tempo nel component in carico dello shrinking non viene aggiornato correttamente
-e quindi la barra nella HUD non scorre
-- [BUG] Il pick up lato client avviene con un po' di lag
+
+
 
 #OF NOTICE
 Sto usando they al posto di he/she al singolare 
