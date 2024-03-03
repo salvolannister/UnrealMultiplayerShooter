@@ -88,14 +88,22 @@ class SHOOTERGAME_API UMy_ShooterCharacterMovement : public UShooterCharacterMov
 public:
 	// Function called from the input binding in the character
 	UMy_ShooterCharacterMovement();
+	
 	UFUNCTION(BlueprintCallable, Category = "Custom Character Movement")
     void Teleport();
+	
 	void UseJetpack();
+	
 	void StopJetpacking();
+
 	bool IsClient();
+
 	bool CanUseJetpack();
+
 	bool IsCustomMovementMode(uint8 customMove) const;
+
 	float GetJetpackResource();
+
 	float GetJetpackFullResource();
 
 	void ChangeScale(uint8 bShrink);
@@ -110,7 +118,8 @@ private:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)  override;
 
 	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
-
+	
+	// Function run in both server and client to set jetpack physics 
 	void PhysJetpack(float deltaTime, int32 Iterations);
 
 	
@@ -132,7 +141,6 @@ private:
 	// Teleport
 	// Location to which the character will teleport
 	FVector TeleportLocation;
-
 
 	//Distance you want to be teleported to
 	float TeleportOffset;
