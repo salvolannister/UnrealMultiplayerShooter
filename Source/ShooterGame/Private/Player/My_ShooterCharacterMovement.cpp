@@ -128,10 +128,7 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations)
 {
 
-
-	if (!bWantsToUseJetpack ||
-		
-		fJetpackResource <= (deltaTime / MaxHoldJetpackTime))
+	if (!bWantsToUseJetpack || fJetpackResource <= (deltaTime / MaxHoldJetpackTime))
 	{
 		bWantsToUseJetpack = false;
 		SetMovementMode(EMovementMode::MOVE_Falling);
@@ -146,8 +143,9 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 	Velocity.Z += desiredTotalJetpackAccel * deltaTime;
 
 	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, fJetpackFullResource);
-
-	PhysFalling(deltaTime, Iterations);
+	// change character movement to something else
+	SetMovementMode(EMovementMode::MOVE_Falling);
+	StartNewPhysics(deltaTime, Iterations);
 }
 
 
