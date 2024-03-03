@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ShooterGame.h"
+
+#include <OnlineSubsystemUtils.h>
+#include <Materials/MaterialInterface.h>
+
 #include "Pickups/MyShooterPickup_Gun.h"
-#include "OnlineSubsystemUtils.h"
-#include <My_ShooterCharacter.h>
+#include "My_ShooterCharacter.h"
 
 /* The MaskMesh object is replicated setting to "Replicate" in the property, using the method "GetLifetimeReplicatedProps" and ensuring that the
 constructor sets bReplicates to true*/
@@ -26,7 +29,7 @@ void AMyShooterPickup_Gun::OnRep_MaskMesh()
 }
 
 void AMyShooterPickup_Gun::OnRep_Materials() {
-	SetWeaponMaterials(Materials);
+	SetWeaponMaterials(GunMaterials);
 
 }
 
@@ -36,7 +39,7 @@ void AMyShooterPickup_Gun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 
 	// Tells the network when to replicate the variables
 	DOREPLIFETIME(AMyShooterPickup_Gun, MaskMesh);
-	DOREPLIFETIME(AMyShooterPickup_Gun, Materials);
+	DOREPLIFETIME(AMyShooterPickup_Gun, GunMaterials);
 }
 
 void AMyShooterPickup_Gun::SetAmmoClips(int32 Clips)
@@ -58,11 +61,11 @@ void AMyShooterPickup_Gun::SetWeaponPickupMesh(USkeletalMesh* WeaponMesh)
 
 }
 
-void AMyShooterPickup_Gun::SetWeaponMaterials(TArray<UMaterialInterface*> Materials)
+void AMyShooterPickup_Gun::SetWeaponMaterials(TArray<UMaterialInterface*> GunMaterials)
 {
-	for (int32 Index = 0, length = Materials.Num(); Index != length; ++Index)
+	for (int32 Index = 0, length = GunMaterials.Num(); Index != length; ++Index)
 	{
-		PickupMesh->SetMaterial(Index, Materials[Index]);
+		PickupMesh->SetMaterial(Index, GunMaterials[Index]);
 	}
 
 }

@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Pickups/ShooterPickup_Ammo.h"
-#include "Weapons/ShooterWeapon.h"
 #include "Net/UnrealNetwork.h"
+
+#include "Weapons/ShooterWeapon.h"
+#include "Pickups/ShooterPickup_Ammo.h"
+
 #include "MyShooterPickup_Gun.generated.h"
 
 /**
  *
  */
-
+class UMaterialInterface;
  //Class that stores the data of the pickup weapon 
 UCLASS(Abstract, Blueprintable)
 class SHOOTERGAME_API AMyShooterPickup_Gun : public AShooterPickup_Ammo
@@ -26,7 +28,7 @@ public:
 	USkeletalMesh* MaskMesh;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Materials)
-	TArray<UMaterialInterface*> Materials;
+	TArray<UMaterialInterface*> GunMaterials;
 
 	//Replicates mesh changes on clients
 	UFUNCTION()
@@ -49,7 +51,7 @@ public:
 	void SetWeaponPickupMesh(USkeletalMesh* WeaponMesh);
 
 	/** Set Materials of the weapon to spawn */
-	void SetWeaponMaterials(TArray<UMaterialInterface*> Materials);
+	void SetWeaponMaterials(TArray<UMaterialInterface*> GunMaterials);
 
 private:
 

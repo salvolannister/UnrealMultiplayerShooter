@@ -130,9 +130,9 @@ void AMy_ShooterCharacter::DropWeapon()
 		DroppedGun->SetAmmoLoadedClip(CurrentAmmo % EquippedWeapon->GetAmmoPerClip());
 		USkeletalMeshComponent* EquippedWeaponMeshComponent = EquippedWeapon->GetWeaponMesh();
 		DroppedGun->MaskMesh = EquippedWeaponMeshComponent->SkeletalMesh; // mask variable to trigger OnRep call
-		DroppedGun->Materials = EquippedWeaponMeshComponent->GetMaterials();
+		DroppedGun->GunMaterials = EquippedWeaponMeshComponent->GetMaterials();
 		DroppedGun->SetWeaponPickupMesh(DroppedGun->MaskMesh); // update mesh when called by the server
-		DroppedGun->SetWeaponMaterials(DroppedGun->Materials);
+		DroppedGun->SetWeaponMaterials(DroppedGun->GunMaterials);
 		TSubclassOf<class AShooterWeapon> WeapType;
 		switch (EquippedWeapon->GetAmmoType())
 		{
