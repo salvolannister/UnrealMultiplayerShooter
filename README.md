@@ -17,7 +17,7 @@ When a player is hit by a rocket of the shrink weapon. They shrinks and if someo
 # TODO
 
 - Add overlay for shrinking
-- The gun seems not to auto destroy if no one takes it
+- The gun seems not to auto destroy itself, if no one takes it
 - Don't send teleport location, but calculate it from both server and user side (this strategy reduces lag)
 - Set physics to falling when using Jetpack
 - Strange behaviour when you press J while landing 
