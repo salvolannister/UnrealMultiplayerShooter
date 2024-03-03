@@ -2,13 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include <CoreMinimal.h>
+#include <Net/UnrealNetwork.h>
+
 #include "Player/ShooterCharacter.h"
-#include "Net/UnrealNetwork.h"
-#include "../MyActorShrinkComponent.h"
+
 #include "My_ShooterCharacter.generated.h"
 
 class UMy_ShooterCharacterMovement;
+class UMyActorShrinkComponent;
 
 UCLASS()
 class SHOOTERGAME_API AMy_ShooterCharacter : public AShooterCharacter
@@ -20,11 +22,11 @@ public:
 	AMy_ShooterCharacter(const class FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shrink")
-	class UMyActorShrinkComponent* ShrinkComponent;
+	UMyActorShrinkComponent* ShrinkComponent;
 
 	// Function for get our Movement Component without casting
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-    UMy_ShooterCharacterMovement* GetMyMovementComponent() const;
+    UMy_ShooterCharacterMovement* GetMyMovementComponent();
 
 	UFUNCTION(unreliable, server, WithValidation)
 	void ServerTakeWeapon(AMyShooterPickup_Gun *weapon);
@@ -66,7 +68,7 @@ private:
 	void Teleport();
 	// Function that will call teh Jetpack implementation in the Movement Component
 	void UseJetpack();
-	// Funciton called when the jetpacking button is realesed
+	// Function called when the jetpacking button is realesed
 	void StopJetpacking();
 	// Function called when the player dies and has a weapon with ammo greater than zero
 	void DropWeapon();
@@ -75,18 +77,25 @@ private:
 
 	//Function that updates the variables related to the shrink effect on the character
 	void Shrink(bool shrink,float fShrinkTime, bool skipInterpolation = false);
+	
+	// Keeps a copy of the character movement, uproperty ensure the data is handled by Unreal GC
+	UPROPERTY()
+	UMy_ShooterCharacterMovement* ShooterCharacterMovement;
 
 	TSubclassOf<class AShooterPickup_Ammo> ShooterPickupDroppedGunClass;
 
+#pragma region weapon
 	/** Weapon type: rifle */
 	TSubclassOf<class AShooterWeapon> WeaponTypeRifle;
 
 	/** Weapon type: rocket launcher */
+	
 	TSubclassOf<class AShooterWeapon> WeaponTypeRocketLauncher;
 	/** Weapon type is a shrink rocket launcher*/
+	
 	TSubclassOf<class AShooterWeapon> WeaponTypeShrinkLauncher;
 	// Add new weapon here
-
+#pragma endregion
 
 protected:
 

@@ -23,12 +23,6 @@ void UMy_ShooterCharacterMovement::BeginPlay()
 }
 
 
-
-
-
-
-
-
 bool UMy_ShooterCharacterMovement::IsClient()
 {
 	return PawnOwner->GetLocalRole() == ENetRole::ROLE_AutonomousProxy;
@@ -65,6 +59,11 @@ float UMy_ShooterCharacterMovement::GetJetpackResource()
 float UMy_ShooterCharacterMovement::GetJetpackFullResource()
 {
 	return fJetpackFullResource;
+}
+
+bool UMy_ShooterCharacterMovement::IsFalling() const
+{
+	return Super::IsFalling() || IsCustomMovementMode(ECustomMovementMode::CMOVE_JETPACKING);
 }
 
 //TODO: implement a check to avoid cheater tricks
@@ -124,7 +123,7 @@ bool UMy_ShooterCharacterMovement::CanUseJetpack()
 	return true;
 }
 
-//Is run on both server and clien
+
 void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations)
 {
 
@@ -145,7 +144,7 @@ void UMy_ShooterCharacterMovement::PhysJetpack(float deltaTime, int32 Iterations
 	fJetpackResource = FMath::Clamp<float>(fJetpackResource - (deltaTime / MaxHoldJetpackTime), 0, fJetpackFullResource);
 	// change character movement to something else
 	SetMovementMode(EMovementMode::MOVE_Falling);
-	StartNewPhysics(deltaTime, Iterations);
+	PhysFalling(deltaTime, Iterations);
 }
 
 

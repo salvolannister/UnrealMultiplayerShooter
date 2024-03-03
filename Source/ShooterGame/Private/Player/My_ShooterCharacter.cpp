@@ -3,6 +3,7 @@
 #include "ShooterGame.h"
 #include "My_ShooterCharacter.h"
 #include "My_ShooterCharacterMovement.h"
+#include "../MyActorShrinkComponent.h"
 #include "MyShooterPickup_Gun.h"
 
 
@@ -32,6 +33,7 @@ void AMy_ShooterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ShrinkComponent = FindComponentByClass<UMyActorShrinkComponent>();
+	
 	if (!HasAnyFlags(RF_ClassDefaultObject | RF_ArchetypeObject))
 	{
 		OnActorHit.AddDynamic(this, &AMy_ShooterCharacter::OnHit);
@@ -78,6 +80,7 @@ void AMy_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// Binding for jetpack
 	PlayerInputComponent->BindAction("UseJetpack", IE_Pressed, this, &AMy_ShooterCharacter::UseJetpack);
+	
 	// IE_Released stop jetpacking 
 	PlayerInputComponent->BindAction("UseJetpack", EInputEvent::IE_Released, this, &AMy_ShooterCharacter::StopJetpacking);
 }
@@ -286,9 +289,12 @@ bool AMy_ShooterCharacter::ServerShrink_Validate(bool shrink, float fShrinkTime,
 }
 
 
-// Function for get our Movement Component 
-UMy_ShooterCharacterMovement* AMy_ShooterCharacter::GetMyMovementComponent() const
+UMy_ShooterCharacterMovement* AMy_ShooterCharacter::GetMyMovementComponent()
 {
-	return Cast<UMy_ShooterCharacterMovement>(GetCharacterMovement());
+	if (!ShooterCharacterMovement)
+	{
+		ShooterCharacterMovement = Cast<UMy_ShooterCharacterMovement>(GetCharacterMovement());
+	}
+	return ShooterCharacterMovement;
 }
 

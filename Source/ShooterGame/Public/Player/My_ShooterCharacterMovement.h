@@ -107,6 +107,8 @@ public:
 	float GetJetpackFullResource();
 
 	void ChangeScale(uint8 bShrink);
+
+	virtual bool IsFalling() const override;
 private:
 	virtual void BeginPlay() override;
 	// Function to decompress flags from a saved Move
